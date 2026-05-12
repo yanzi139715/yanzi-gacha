@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>妍子Cosplay抽卡集</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- 顶部状态栏 -->
+  <header class="top-bar">
+    <div class="top-bar-inner">
+      <div class="brand">妍子Cos集</div>
+      <div class="stats">
+        <div class="stat" title="抽卡券">
+          <span class="stat-icon">&#x1F3AB;</span>
+          <span id="ticket-count">0</span>
+        </div>
+        <div class="stat" title="金币">
+          <span class="stat-icon">&#x1FA99;</span>
+          <span id="coin-count">0</span>
+        </div>
+        <div class="stat" title="SSR保底">
+          <span class="stat-icon">&#x2B50;</span>
+          <span id="pity-count">0/90</span>
+        </div>
+        <div class="stat" title="已收集">
+          <span class="stat-icon">&#x1F4DA;</span>
+          <span id="collection-count">0</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <main class="main-content">
+
+    <!-- 抽卡页 -->
+    <section id="page-gacha" class="tab-page active">
+      <div class="banner" id="banner">
+        <div class="banner-overlay">
+          <h1>妍子Cosplay抽卡集</h1>
+          <p>收集你的本命角色卡牌</p>
+        </div>
+      </div>
+
+      <div class="gacha-pool">
+        <div class="pool-visual">
+          <div class="pool-card pool-ssr">
+            <span>SSR</span>
+            <small>3%</small>
+          </div>
+          <div class="pool-card pool-sr">
+            <span>SR</span>
+            <small>15%</small>
+          </div>
+          <div class="pool-card pool-r">
+            <span>R</span>
+            <small>82%</small>
+          </div>
+        </div>
+
+        <div class="gacha-buttons">
+          <button id="btn-single" class="btn-pull btn-single">
+            <span class="btn-icon">&#x1F3B0;</span>
+            <span class="btn-text">单抽</span>
+            <span class="btn-cost">1券/10金币</span>
+          </button>
+          <button id="btn-ten" class="btn-pull btn-ten">
+            <span class="btn-icon">&#x2728;</span>
+            <span class="btn-text">十连抽</span>
+            <span class="btn-cost">10券/100金币</span>
+            <span class="btn-badge">保底SR</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 最近抽到的卡 -->
+      <div class="recent-section">
+        <h2>当前卡池角色</h2>
+        <div class="char-preview" id="char-preview"></div>
+      </div>
+    </section>
+
+    <!-- 图鉴页 -->
+    <section id="page-collection" class="tab-page">
+      <div class="page-header">
+        <h2>角色图鉴</h2>
+        <div class="filter-bar">
+          <button class="filter-btn active" data-filter="ALL">全部</button>
+          <button class="filter-btn" data-filter="SSR">SSR</button>
+          <button class="filter-btn" data-filter="SR">SR</button>
+          <button class="filter-btn" data-filter="R">R</button>
+        </div>
+      </div>
+      <div id="collection-grid" class="collection-grid"></div>
+    </section>
+
+    <!-- 任务页 -->
+    <section id="page-tasks" class="tab-page">
+      <div class="page-header">
+        <h2>任务中心</h2>
+        <p class="page-subtitle">完成任务获取抽卡券</p>
+      </div>
+      <div id="task-list" class="task-list"></div>
+    </section>
+
+    <!-- 商店页 -->
+    <section id="page-shop" class="tab-page">
+      <div class="page-header">
+        <h2>商店</h2>
+        <p class="page-subtitle">购买金币，解锁更多抽卡机会</p>
+      </div>
+      <div id="shop-list" class="shop-list"></div>
+    </section>
+
+  </main>
+
+  <!-- 底部导航 -->
+  <nav class="bottom-nav">
+    <button class="tab-btn active" data-tab="gacha">
+      <span class="nav-icon">&#x1F3B0;</span>
+      <span class="nav-label">抽卡</span>
+    </button>
+    <button class="tab-btn" data-tab="collection">
+      <span class="nav-icon">&#x1F4DA;</span>
+      <span class="nav-label">图鉴</span>
+    </button>
+    <button class="tab-btn" data-tab="tasks">
+      <span class="nav-icon">&#x2705;</span>
+      <span class="nav-label">任务</span>
+    </button>
+    <button class="tab-btn" data-tab="shop">
+      <span class="nav-icon">&#x1F6D2;</span>
+      <span class="nav-label">商店</span>
+    </button>
+  </nav>
+
+  <!-- 抽卡结果弹窗 -->
+  <div id="pull-overlay" class="overlay">
+    <div class="pull-results" id="pull-results"></div>
+    <p class="overlay-hint">点击任意处关闭</p>
+  </div>
+
+  <!-- 卡牌详情弹窗 -->
+  <div id="detail-overlay" class="overlay">
+    <div id="detail-content" class="detail-content"></div>
+  </div>
+
+  <script src="js/cards.js"></script>
+  <script src="js/gacha.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
