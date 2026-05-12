@@ -8,7 +8,9 @@ const UI = {
     container.innerHTML = '';
 
     const isTenPull = cards.length > 1;
+    const hasRare = cards.some(c => c.rarity !== 'R');
 
+    // 第一步：所有卡快速翻入
     cards.forEach((card, index) => {
       const cardEl = this.createCardElement(card);
       cardEl.style.opacity = '0';
@@ -16,32 +18,72 @@ const UI = {
       container.appendChild(cardEl);
 
       const delay = isTenPull ? index * 100 : 0;
-
-      // 所有卡先弹出
       setTimeout(() => {
-        cardEl.style.transition = 'opacity 0.35s ease-out, transform 0.35s ease-out';
+        cardEl.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
         cardEl.style.opacity = '1';
         cardEl.style.transform = 'scale(1)';
-
-        // SR/SSR 再放大弹出
-        if (card.rarity !== 'R') {
-          setTimeout(() => {
-            cardEl.style.transition = 'transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.6s ease';
-            if (card.rarity === 'SSR') {
-              cardEl.style.transform = 'scale(1.18)';
-              cardEl.style.boxShadow = '0 0 30px rgba(255,215,0,0.4)';
-              cardEl.style.zIndex = '10';
-              cardEl.classList.add('glow-ssr');
-            } else {
-              cardEl.style.transform = 'scale(1.1)';
-              cardEl.style.boxShadow = '0 0 20px rgba(232,160,191,0.35)';
-              cardEl.style.zIndex = '5';
-              cardEl.classList.add('glow-sr');
-            }
-          }, 400);
-        }
       }, delay);
     });
+
+    if (!hasRare) return;
+
+    // 第二步：全部翻完后，悬停一瞬（铺垫紧张感）
+    const flipDone = isTenPull ? cards.length * 100 + 300 : 400;
+
+    setTimeout(() => {
+      // 所有卡微微缩小，制造"还没结束"的感觉
+      container.querySelectorAll('.card').forEach(el => {
+        el.style.transition = 'transform 0.3s ease-in';
+        el.style.transform = 'scale(0.92)';
+      });
+    }, flipDone);
+
+    // 第三步：屏幕闪白
+    setTimeout(() => {
+      const flash = document.createElement('div');
+      flash.style.cssText = 'position:fixed;inset:0;background:white;z-index:999;opacity:0;pointer-events:none;transition:opacity 0.1s;';
+      document.body.appendChild(flash);
+      requestAnimationFrame(() => {
+        flash.style.opacity = '0.7';
+        setTimeout(() => {
+          flash.style.opacity = '0';
+          setTimeout(() => flash.remove(), 200);
+        }, 120);
+      });
+    }, flipDone + 500);
+
+    // 第四步：闪白后，稀有卡爆开
+    setTimeout(() => {
+      container.querySelectorAll('.card').forEach((cardEl, i) => {
+        const rarity = cards[i].rarity;
+        if (rarity === 'SSR') {
+          cardEl.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.5s ease, filter 0.5s ease';
+          cardEl.style.transform = 'scale(1.25)';
+          cardEl.style.boxShadow = '0 0 40px rgba(255,215,0,0.5)';
+          cardEl.style.filter = 'brightness(1.3)';
+          cardEl.style.zIndex = '10';
+          cardEl.classList.add('glow-ssr');
+          // 回弹
+          setTimeout(() => {
+            cardEl.style.transition = 'transform 0.4s ease-out';
+            cardEl.style.transform = 'scale(1.18)';
+            cardEl.style.filter = 'brightness(1.1)';
+          }, 500);
+        } else if (rarity === 'SR') {
+          cardEl.style.transition = 'transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.45s ease, filter 0.45s ease';
+          cardEl.style.transform = 'scale(1.18)';
+          cardEl.style.boxShadow = '0 0 25px rgba(232,160,191,0.4)';
+          cardEl.style.filter = 'brightness(1.2)';
+          cardEl.style.zIndex = '5';
+          cardEl.classList.add('glow-sr');
+          setTimeout(() => {
+            cardEl.style.transition = 'transform 0.3s ease-out';
+            cardEl.style.transform = 'scale(1.1)';
+            cardEl.style.filter = 'brightness(1.05)';
+          }, 450);
+        }
+      });
+    }, flipDone + 650);
 
     overlay.onclick = (e) => {
       if (e.target === overlay || e.target.classList.contains('pull-results-wrapper')) {
