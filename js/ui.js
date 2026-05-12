@@ -1,6 +1,6 @@
 // UI动画与交互
 const UI = {
-  // ===== 抽卡结果（带仪式动画） =====
+  // ===== 抽卡结果（神秘揭晓风格） =====
   showPullResults(cards, callback) {
     const overlay = document.getElementById('pull-overlay');
     const container = document.getElementById('pull-results');
@@ -15,7 +15,7 @@ const UI = {
     else if (cards.some(c => c.rarity === 'SR')) highestRarity = 'SR';
 
     if (highestRarity === 'R') {
-      // R卡：直接展示，简单翻转
+      // R卡：直接展示卡背 → 翻转
       this._showCards(cards, container);
       overlay.onclick = (e) => {
         if (e.target === overlay || e.target.classList.contains('pull-results-wrapper')) {
@@ -26,12 +26,10 @@ const UI = {
       return;
     }
 
-    // SR/SSR：先播放仪式动画
-    // 先隐藏卡片区域
+    // SR/SSR：先播放氛围动画
     wrapper.style.opacity = '0';
     wrapper.style.pointerEvents = 'none';
 
-    // 创建仪式容器
     const ceremony = document.createElement('div');
     ceremony.className = 'gacha-ceremony active';
     const rarityType = highestRarity.toLowerCase();
@@ -64,13 +62,7 @@ const UI = {
     }
     ceremony.appendChild(particles);
 
-    // 4. 稀有度文字
-    const rarityText = document.createElement('div');
-    rarityText.className = `ceremony-rarity-text ${rarityType}`;
-    rarityText.textContent = highestRarity;
-    ceremony.appendChild(rarityText);
-
-    // 5. 扩散光环
+    // 4. 扩散光环
     for (let i = 0; i < 3; i++) {
       const ring = document.createElement('div');
       ring.className = `ceremony-ring ${rarityType}`;
@@ -78,7 +70,7 @@ const UI = {
       ceremony.appendChild(ring);
     }
 
-    // 6. SSR专属：额外光柱
+    // 5. SSR专属：额外光柱
     if (rarityType === 'ssr') {
       const beam2 = document.createElement('div');
       beam2.className = 'ceremony-beam ssr';
@@ -97,19 +89,19 @@ const UI = {
 
     overlay.appendChild(ceremony);
 
-    // 仪式时长后，展示卡牌
-    const ceremonyDuration = rarityType === 'ssr' ? 2000 : 1500;
+    // 氛围动画后，展示卡背 → 翻转揭晓
+    const ceremonyDuration = rarityType === 'ssr' ? 1500 : 1000;
     setTimeout(() => {
-      ceremony.style.transition = 'opacity 0.4s';
+      ceremony.style.transition = 'opacity 0.3s';
       ceremony.style.opacity = '0';
-      wrapper.style.transition = 'opacity 0.3s';
+      wrapper.style.transition = 'opacity 0.2s';
       wrapper.style.opacity = '1';
       wrapper.style.pointerEvents = 'auto';
 
       setTimeout(() => {
         ceremony.remove();
         this._showCards(cards, container);
-      }, 400);
+      }, 300);
     }, ceremonyDuration);
 
     overlay.onclick = (e) => {
@@ -127,10 +119,8 @@ const UI = {
 
     cards.forEach((card, index) => {
       const cardEl = this.createCardElement(card, true);
-      // 根据稀有度添加对应动画类
       const rarityClass = `${card.rarity.toLowerCase()}-card`;
       cardEl.classList.add(rarityClass);
-      // 十连时加延迟类
       if (isTenPull) {
         cardEl.classList.add(`card-delay-${index + 1}`);
       }
@@ -147,8 +137,8 @@ const UI = {
 
     el.innerHTML = `
       <div class="card-inner">
+        ${withAnimation ? `<div class="card-back"><span class="mystery-icon">?</span></div>` : ''}
         <div class="card-front">
-          <div class="card-glow" style="box-shadow: 0 0 30px ${config.glow}, inset 0 0 30px ${config.glow}"></div>
           <img src="${card.image}" alt="${card.characterName}" loading="lazy">
           <div class="card-info">
             <span class="card-rarity" style="background: ${config.gradient}">${config.label}</span>

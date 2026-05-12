@@ -611,23 +611,23 @@ html, body {
 /* ===== 卡牌 ===== */
 .card {
   width: 125px; border-radius: 14px;
-  overflow: hidden; cursor: pointer;
+  cursor: pointer;
   transition: transform 0.2s; position: relative;
   box-shadow: 0 4px 16px var(--shadow);
+  perspective: 600px;
 }
 
 .card:active { transform: scale(0.95); }
-.card-inner { position: relative; }
-.card-front { position: relative; }
 
+.card-inner {
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.card-front { position: relative; backface-visibility: hidden; overflow: hidden; border-radius: 14px; }
 .card-front img {
   width: 100%; height: 165px;
   object-fit: cover; display: block;
-}
-
-.card-glow {
-  position: absolute; inset: 0;
-  border-radius: 14px; pointer-events: none; z-index: 1;
 }
 
 .card-info {
@@ -661,102 +661,150 @@ html, body {
 .card-sr { border: 2px solid var(--rose); box-shadow: 0 0 14px rgba(232,160,191,0.25); }
 .card-r { border: 2px solid var(--blue-soft); box-shadow: 0 0 10px rgba(137,207,240,0.2); }
 
-/* ===== R卡 - 简单快速翻转 ===== */
-.card-reveal.r-card {
-  animation: cardFlipR 0.5s ease-out forwards;
-  opacity: 0; transform: scale(0.7) rotateY(180deg);
+/* ===== 神秘卡背 ===== */
+.card-back {
+  position: absolute; inset: 0;
+  background: linear-gradient(145deg, #2D1B4E 0%, #1A0A30 40%, #2D1B4E 100%);
+  border-radius: 14px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 5; backface-visibility: hidden;
+  overflow: hidden;
 }
 
-@keyframes cardFlipR {
-  0% { opacity: 0; transform: scale(0.7) rotateY(180deg); }
-  60% { opacity: 1; transform: scale(1.03) rotateY(20deg); }
-  100% { opacity: 1; transform: scale(1) rotateY(0); }
+.card-back::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(255,105,180,0.15) 0%, transparent 60%);
+  animation: mysteryPulse 1.5s ease-in-out infinite;
 }
 
-/* ===== SR卡 - 弹出+粉色光效 ===== */
-.card-reveal.sr-card {
-  animation: cardPopSR 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  opacity: 0; transform: scale(0) rotateZ(10deg);
+.card-back::after {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%; width: 200%; height: 200%;
+  background: conic-gradient(from 0deg, transparent 0%, rgba(255,255,255,0.05) 10%, transparent 20%);
+  animation: mysterySpin 3s linear infinite;
 }
 
-.card-reveal.sr-card .card-glow {
-  animation: glowPulseSR 1.2s ease-out;
+.mystery-icon {
+  font-size: 36px; z-index: 1;
+  animation: mysteryFloat 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(255,105,180,0.6));
 }
 
-@keyframes cardPopSR {
-  0% { opacity: 0; transform: scale(0) rotateZ(10deg); }
-  40% { opacity: 1; transform: scale(1.15) rotateZ(-3deg); }
-  60% { transform: scale(0.95) rotateZ(1deg); }
-  80% { transform: scale(1.05) rotateZ(0); }
-  100% { opacity: 1; transform: scale(1) rotateZ(0); }
+@keyframes mysteryPulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
 }
 
-@keyframes glowPulseSR {
-  0% { box-shadow: inset 0 0 0 rgba(232,160,191,0); }
-  30% { box-shadow: inset 0 0 40px rgba(232,160,191,0.5); }
-  100% { box-shadow: inset 0 0 0 rgba(232,160,191,0); }
+@keyframes mysterySpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-/* ===== SSR卡 - 完整仪式：弹出+缩放+脉冲光环 ===== */
+@keyframes mysteryFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-6px) scale(1.1); }
+}
+
+/* ===== 神秘揭晓动画 - 所有稀有度通用翻转 ===== */
+.card-reveal .card-inner {
+  transform: rotateY(180deg);
+  opacity: 0;
+}
+
+/* R卡 - 快速翻转 */
+.card-reveal.r-card .card-inner {
+  animation: mysteryRevealR 0.5s ease-out 0.2s forwards;
+}
+
+@keyframes mysteryRevealR {
+  0% { transform: rotateY(180deg); opacity: 0; }
+  30% { transform: rotateY(180deg); opacity: 1; }
+  100% { transform: rotateY(0deg); opacity: 1; }
+}
+
+/* SR卡 - 悬停翻转 + 粉色闪光 */
+.card-reveal.sr-card .card-inner {
+  animation: mysteryRevealSR 0.7s ease-out 0.4s forwards;
+}
+
+.card-reveal.sr-card::before {
+  content: '';
+  position: absolute; inset: -3px;
+  border-radius: 17px; z-index: -1;
+  background: conic-gradient(from 0deg, #E8A0BF, #C084FC, #E8A0BF, #F0B6D6, #E8A0BF);
+  animation: borderSpinSR 3s linear infinite, borderFadeSR 0.6s ease-out 1.0s forwards;
+  opacity: 0;
+}
+
+@keyframes mysteryRevealSR {
+  0% { transform: rotateY(180deg) scale(0.8); opacity: 0; }
+  30% { transform: rotateY(180deg) scale(0.8); opacity: 1; }
+  70% { transform: rotateY(10deg) scale(1.1); }
+  85% { transform: rotateY(-5deg) scale(1.02); }
+  100% { transform: rotateY(0deg) scale(1); opacity: 1; }
+}
+
+@keyframes borderSpinSR {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes borderFadeSR {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* SSR卡 - 慢速翻转 + 金光爆发 */
 .card-reveal.ssr-card {
-  animation: cardEntranceSSR 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  opacity: 0; transform: scale(0) rotateZ(15deg);
   z-index: 10;
 }
 
-.card-reveal.ssr-card .card-glow {
-  animation: glowPulseSSR 2s ease-out;
+.card-reveal.ssr-card .card-inner {
+  animation: mysteryRevealSSR 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s forwards;
 }
 
 .card-reveal.ssr-card::before {
   content: '';
   position: absolute; inset: -4px;
-  border-radius: 18px;
+  border-radius: 18px; z-index: -1;
   background: conic-gradient(from 0deg, #FFD700, #FFA500, #FFD700, #FFEC8B, #FFD700);
-  z-index: -1;
-  animation: borderSpinSSR 3s linear infinite;
+  animation: borderSpinSSR 2s linear infinite, borderFadeSSR 0.5s ease-out 1.4s forwards;
   opacity: 0;
-  animation: borderSpinSSR 3s linear infinite, borderFadeIn 1.2s ease-out forwards;
 }
 
 .card-reveal.ssr-card::after {
   content: '';
   position: absolute; inset: 0;
-  background: linear-gradient(45deg, transparent 30%, rgba(255,215,0,0.15) 50%, transparent 70%);
-  animation: ssrShineCard 2s ease-in-out infinite;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,215,0,0.2) 50%, transparent 70%);
+  animation: ssrShineCard 2.5s ease-in-out infinite;
   border-radius: 14px;
-  z-index: 2;
-  pointer-events: none;
+  z-index: 2; pointer-events: none;
 }
 
-@keyframes cardEntranceSSR {
-  0% { opacity: 0; transform: scale(0) rotateZ(15deg); }
-  25% { opacity: 1; transform: scale(1.2) rotateZ(-5deg); }
-  40% { transform: scale(0.9) rotateZ(3deg); }
-  55% { transform: scale(1.1) rotateZ(-1deg); }
-  70% { transform: scale(0.97) rotateZ(0.5deg); }
-  85% { transform: scale(1.03) rotateZ(0); }
-  100% { transform: scale(1) rotateZ(0); }
+.card-reveal.ssr-card .card-front {
+  animation: glowBurstSSR 0.8s ease-out 1.2s;
 }
 
-@keyframes glowPulseSSR {
-  0% { box-shadow: inset 0 0 0 rgba(255,215,0,0); }
-  20% { box-shadow: inset 0 0 60px rgba(255,215,0,0.6), 0 0 40px rgba(255,215,0,0.4); }
-  50% { box-shadow: inset 0 0 30px rgba(255,215,0,0.3), 0 0 20px rgba(255,215,0,0.2); }
-  70% { box-shadow: inset 0 0 50px rgba(255,215,0,0.5), 0 0 30px rgba(255,215,0,0.3); }
-  100% { box-shadow: inset 0 0 0 rgba(255,215,0,0); }
+@keyframes mysteryRevealSSR {
+  0% { transform: rotateY(180deg) scale(0.6); opacity: 0; }
+  25% { transform: rotateY(180deg) scale(0.6); opacity: 1; }
+  55% { transform: rotateY(20deg) scale(1.2); }
+  75% { transform: rotateY(-8deg) scale(1.08); }
+  88% { transform: rotateY(3deg) scale(1.02); }
+  100% { transform: rotateY(0deg) scale(1); opacity: 1; }
 }
 
 @keyframes borderSpinSSR {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-@keyframes borderFadeIn {
+@keyframes borderFadeSSR {
   0% { opacity: 0; }
-  30% { opacity: 1; }
-  80% { opacity: 1; }
-  100% { opacity: 0.5; }
+  100% { opacity: 1; }
 }
 
 @keyframes ssrShineCard {
@@ -764,17 +812,23 @@ html, body {
   50% { transform: translateX(100%); }
 }
 
-/* 十连中R卡延迟出现 */
+@keyframes glowBurstSSR {
+  0% { filter: brightness(1) drop-shadow(0 0 0 transparent); }
+  50% { filter: brightness(1.5) drop-shadow(0 0 20px rgba(255,215,0,0.8)); }
+  100% { filter: brightness(1) drop-shadow(0 0 0 transparent); }
+}
+
+/* 十连延迟 */
 .card-delay-1 { animation-delay: 0s !important; }
-.card-delay-2 { animation-delay: 0.08s !important; }
-.card-delay-3 { animation-delay: 0.16s !important; }
-.card-delay-4 { animation-delay: 0.24s !important; }
-.card-delay-5 { animation-delay: 0.32s !important; }
-.card-delay-6 { animation-delay: 0.40s !important; }
-.card-delay-7 { animation-delay: 0.48s !important; }
-.card-delay-8 { animation-delay: 0.56s !important; }
-.card-delay-9 { animation-delay: 0.64s !important; }
-.card-delay-10 { animation-delay: 0.72s !important; }
+.card-delay-2 { animation-delay: 0.1s !important; }
+.card-delay-3 { animation-delay: 0.2s !important; }
+.card-delay-4 { animation-delay: 0.3s !important; }
+.card-delay-5 { animation-delay: 0.4s !important; }
+.card-delay-6 { animation-delay: 0.5s !important; }
+.card-delay-7 { animation-delay: 0.6s !important; }
+.card-delay-8 { animation-delay: 0.7s !important; }
+.card-delay-9 { animation-delay: 0.8s !important; }
+.card-delay-10 { animation-delay: 0.9s !important; }
 
 /* ===== 卡牌详情 ===== */
 .detail-content {
