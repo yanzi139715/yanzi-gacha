@@ -1,6 +1,6 @@
 // UI动画与交互
 const UI = {
-  // 显示抽卡结果弹窗
+  // ===== 抽卡结果 =====
   showPullResults(cards, callback) {
     const overlay = document.getElementById('pull-overlay');
     const container = document.getElementById('pull-results');
@@ -13,14 +13,14 @@ const UI = {
       container.appendChild(cardEl);
     });
 
-    // 点击关闭
-    overlay.onclick = () => {
-      overlay.classList.remove('active');
-      if (callback) callback();
+    overlay.onclick = (e) => {
+      if (e.target === overlay || e.target.classList.contains('pull-results-wrapper')) {
+        overlay.classList.remove('active');
+        if (callback) callback();
+      }
     };
   },
 
-  // 创建卡牌DOM元素
   createCardElement(card, withAnimation = false) {
     const el = document.createElement('div');
     el.className = `card card-${card.rarity.toLowerCase()}`;
@@ -42,7 +42,6 @@ const UI = {
       </div>
     `;
 
-    // 点击查看大图
     el.onclick = (e) => {
       e.stopPropagation();
       this.showCardDetail(card);
@@ -51,28 +50,386 @@ const UI = {
     return el;
   },
 
-  // 卡牌详情弹窗
+  // ===== 卡牌详情（带操作按钮） =====
   showCardDetail(card) {
     const overlay = document.getElementById('detail-overlay');
     const content = document.getElementById('detail-content');
     const config = RARITY_CONFIG[card.rarity];
 
     content.innerHTML = `
-      <div class="detail-card card-${card.rarity.toLowerCase()}">
+      <button class="back-btn" onclick="document.getElementById('detail-overlay').classList.remove('active')">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="detail-card">
         <img src="${card.image}" alt="${card.character.name}">
         <div class="detail-info">
           <h2>${card.character.name}</h2>
           <span class="detail-rarity" style="background: ${config.color}">${config.label}</span>
           <p>${card.character.description}</p>
+          <div class="action-bar">
+            <button class="action-btn" onclick="UI.saveImage('${card.image}', '${card.character.name}_${config.label}')">
+              <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              保存
+            </button>
+            <button class="action-btn primary" onclick="UI.generatePoster('${card.image}', '${card.character.name}', '${card.rarity}', '${card.character.description}')">
+              <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+              生成海报
+            </button>
+          </div>
         </div>
       </div>
     `;
 
     overlay.classList.add('active');
-    overlay.onclick = () => overlay.classList.remove('active');
+    overlay.onclick = (e) => {
+      if (e.target === overlay) overlay.classList.remove('active');
+    };
   },
 
-  // 更新顶部状态栏
+  // ===== 角色画廊 =====
+  showCharacterGallery(char) {
+    const overlay = document.getElementById('detail-overlay');
+    const content = document.getElementById('detail-content');
+    const state = GameState.get();
+    const config = RARITY_CONFIG[char.rarity];
+    const progress = GachaEngine.getCharacterProgress(char.id);
+
+    const cardsHtml = char.images.map((img, idx) => {
+      const uid = `${char.id}_${idx}`;
+      const collected = state.collection.includes(uid);
+      if (collected) {
+        const imgPath = img.replace(/'/g, "\\'");
+        return `<div class="gallery-card">
+          <img src="${img}" loading="lazy" onclick="UI.showCardDetail({character:CHARACTERS.find(c=>c.id==='${char.id}'),image:'${imgPath}',rarity:'${char.rarity}',cardUid:'${uid}',isDuplicate:false})">
+          <div class="gallery-card-actions">
+            <button class="gallery-action-btn" onclick="event.stopPropagation();UI.saveImage('${imgPath}','${char.name}_${config.label}_${idx+1}')" title="保存">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </button>
+            <button class="gallery-action-btn" onclick="event.stopPropagation();UI.generatePoster('${imgPath}','${char.name}','${char.rarity}','${char.description.replace(/'/g, "\\'")}')" title="分享海报">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            </button>
+          </div>
+        </div>`;
+      }
+      const lockClass = char.rarity === 'SSR' ? 'ssr' : (char.rarity === 'SR' ? 'sr' : 'r');
+      return `<div class="gallery-card locked ${lockClass}">
+        <div class="card-locked-icon">?</div>
+      </div>`;
+    }).join('');
+
+    content.innerHTML = `
+      <button class="back-btn" onclick="document.getElementById('detail-overlay').classList.remove('active')">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="gallery">
+        <div class="gallery-header">
+          <h2>${char.name}</h2>
+          <span class="detail-rarity" style="background:${config.color}">${config.label}</span>
+          <p style="font-size:13px;color:var(--text-secondary);margin-top:6px">${char.description}</p>
+          <p class="gallery-progress">收集进度: ${progress.collected}/${progress.total} (${progress.percent}%)</p>
+        </div>
+        <div class="gallery-grid">${cardsHtml}</div>
+      </div>
+    `;
+
+    overlay.classList.add('active');
+    overlay.onclick = (e) => {
+      if (e.target === overlay) overlay.classList.remove('active');
+    };
+  },
+
+  // ===== 保存图片到本地 =====
+  saveImage(imgSrc, filename) {
+    const link = document.createElement('a');
+    link.href = imgSrc;
+    link.download = filename + '.jpg';
+    link.target = '_blank';
+    // 对于同源图片直接下载
+    if (imgSrc.startsWith('img/')) {
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      // 跨域图片打开新标签
+      window.open(imgSrc, '_blank');
+    }
+  },
+
+  // ===== 生成分享海报 =====
+  generatePoster(imgSrc, name, rarity, description) {
+    const canvas = document.getElementById('poster-canvas');
+    const ctx = canvas.getContext('2d');
+    const config = RARITY_CONFIG[rarity];
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const W = 750, H = 1100;
+      canvas.width = W;
+      canvas.height = H;
+
+      // 背景渐变
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+      bgGrad.addColorStop(0, '#0a0a12');
+      bgGrad.addColorStop(0.5, '#151525');
+      bgGrad.addColorStop(1, '#0a0a12');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // 装饰边框
+      const rarityColors = { SSR: '#FFD700', SR: '#C066FF', R: '#4FC3F7' };
+      const color = rarityColors[rarity] || '#4FC3F7';
+
+      // 顶部渐变条
+      const topGrad = ctx.createLinearGradient(0, 0, W, 0);
+      topGrad.addColorStop(0, 'transparent');
+      topGrad.addColorStop(0.3, color);
+      topGrad.addColorStop(0.7, color);
+      topGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = topGrad;
+      ctx.fillRect(0, 0, W, 3);
+
+      // 主图区域
+      const imgW = W - 80;
+      const imgH = Math.min(600, img.height / img.width * imgW);
+      const imgX = 40;
+      const imgY = 60;
+
+      // 图片阴影
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 30;
+      ctx.shadowOffsetY = 5;
+
+      // 绘制圆角图片
+      this.roundRect(ctx, imgX, imgY, imgW, imgH, 16);
+      ctx.save();
+      ctx.clip();
+      ctx.drawImage(img, imgX, imgY, imgW, imgH);
+      ctx.restore();
+
+      // 图片边框
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 3;
+      this.roundRect(ctx, imgX, imgY, imgW, imgH, 16);
+      ctx.stroke();
+
+      // 稀有度标签
+      const tagW = 60;
+      const tagH = 28;
+      const tagX = imgX + imgW - tagW - 12;
+      const tagY = imgY + 12;
+      ctx.fillStyle = color;
+      this.roundRect(ctx, tagX, tagY, tagW, tagH, 6);
+      ctx.fill();
+      ctx.fillStyle = '#000';
+      ctx.font = 'bold 16px -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(rarity, tagX + tagW / 2, tagY + 20);
+
+      // 角色名
+      const textY = imgY + imgH + 40;
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 32px -apple-system, "PingFang SC", sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(name, 40, textY);
+
+      // 描述
+      ctx.fillStyle = '#8888aa';
+      ctx.font = '18px -apple-system, "PingFang SC", sans-serif';
+      const descLines = this.wrapText(ctx, description, W - 80, 18);
+      descLines.forEach((line, i) => {
+        ctx.fillText(line, 40, textY + 32 + i * 26);
+      });
+
+      // 分隔线
+      const lineY = H - 200;
+      const lineGrad = ctx.createLinearGradient(40, 0, W - 40, 0);
+      lineGrad.addColorStop(0, 'transparent');
+      lineGrad.addColorStop(0.5, 'rgba(255,255,255,0.1)');
+      lineGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = lineGrad;
+      ctx.fillRect(40, lineY, W - 80, 1);
+
+      // 二维码区域
+      const qrSize = 120;
+      const qrX = W - 40 - qrSize;
+      const qrY = lineY + 20;
+
+      // 生成二维码
+      try {
+        const qr = qrcode(0, 'M');
+        qr.addData(window.location.href);
+        qr.make();
+        const qrModuleCount = qr.getModuleCount();
+        const moduleSize = qrSize / qrModuleCount;
+
+        // QR码白色背景
+        ctx.fillStyle = '#fff';
+        this.roundRect(ctx, qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 8);
+        ctx.fill();
+
+        // 绘制QR码
+        ctx.fillStyle = '#000';
+        for (let row = 0; row < qrModuleCount; row++) {
+          for (let col = 0; col < qrModuleCount; col++) {
+            if (qr.isDark(row, col)) {
+              ctx.fillRect(qrX + col * moduleSize, qrY + row * moduleSize, moduleSize, moduleSize);
+            }
+          }
+        }
+      } catch (e) {
+        // QR库不可用时跳过
+      }
+
+      // 左侧文字
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 20px -apple-system, "PingFang SC", sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('妍子Cosplay抽卡集', 40, qrY + 20);
+
+      ctx.fillStyle = '#8888aa';
+      ctx.font = '14px -apple-system, sans-serif';
+      ctx.fillText('扫码开始抽卡，收集你的本命角色', 40, qrY + 48);
+      ctx.fillText('SSR / SR / R 三档稀有度等你来拿', 40, qrY + 70);
+
+      // 底部装饰
+      const bottomGrad = ctx.createLinearGradient(0, H - 3, 0, H);
+      bottomGrad.addColorStop(0, color);
+      bottomGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = bottomGrad;
+      ctx.fillRect(0, H - 3, W, 3);
+
+      // 展示海报
+      this.showPosterPreview(canvas.toDataURL('image/jpeg', 0.92));
+    };
+
+    img.onerror = () => {
+      alert('图片加载失败，请重试');
+    };
+
+    img.src = imgSrc;
+  },
+
+  // 辅助：绘制圆角矩形路径
+  roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  },
+
+  // 辅助：文字换行
+  wrapText(ctx, text, maxWidth, fontSize) {
+    const lines = [];
+    let currentLine = '';
+    for (const char of text) {
+      const testLine = currentLine + char;
+      if (ctx.measureText(testLine).width > maxWidth) {
+        lines.push(currentLine);
+        currentLine = char;
+      } else {
+        currentLine = testLine;
+      }
+    }
+    if (currentLine) lines.push(currentLine);
+    return lines.slice(0, 3); // 最多3行
+  },
+
+  // ===== 海报预览弹窗 =====
+  showPosterPreview(dataUrl) {
+    // 创建海报预览弹窗
+    let posterOverlay = document.getElementById('poster-overlay');
+    if (!posterOverlay) {
+      posterOverlay = document.createElement('div');
+      posterOverlay.id = 'poster-overlay';
+      posterOverlay.className = 'poster-overlay';
+      document.body.appendChild(posterOverlay);
+    }
+
+    posterOverlay.innerHTML = `
+      <button class="poster-close-btn" onclick="document.getElementById('poster-overlay').classList.remove('active')">&times;</button>
+      <div class="poster-preview">
+        <img src="${dataUrl}" id="poster-img">
+      </div>
+      <div class="poster-actions">
+        <button class="poster-btn save" onclick="UI.downloadPoster()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px;margin-right:4px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          保存海报
+        </button>
+        <button class="poster-btn share" onclick="UI.sharePoster()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px;margin-right:4px"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          分享
+        </button>
+        <button class="poster-btn close" onclick="document.getElementById('poster-overlay').classList.remove('active')">关闭</button>
+      </div>
+    `;
+
+    posterOverlay.classList.add('active');
+    posterOverlay._dataUrl = dataUrl;
+  },
+
+  // 下载海报
+  downloadPoster() {
+    const overlay = document.getElementById('poster-overlay');
+    const dataUrl = overlay._dataUrl;
+    const link = document.createElement('a');
+    link.download = '妍子Cosplay海报_' + Date.now() + '.jpg';
+    link.href = dataUrl;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  },
+
+  // 分享海报
+  async sharePoster() {
+    const overlay = document.getElementById('poster-overlay');
+    const dataUrl = overlay._dataUrl;
+
+    // 尝试使用Web Share API
+    if (navigator.share && navigator.canShare) {
+      try {
+        const response = await fetch(dataUrl);
+        const blob = await response.blob();
+        const file = new File([blob], '妍子Cosplay海报.jpg', { type: 'image/jpeg' });
+
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: '妍子Cosplay抽卡集',
+            text: '来看看我抽到的卡牌！',
+            files: [file]
+          });
+          return;
+        }
+      } catch (e) {
+        // 分享取消或失败
+      }
+    }
+
+    // 回退：复制图片到剪贴板或下载
+    try {
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': blob })
+      ]);
+      alert('海报已复制到剪贴板！可以粘贴到微信/QQ发送');
+    } catch (e) {
+      // 最终回退：直接下载
+      this.downloadPoster();
+      alert('海报已保存到本地，请手动分享');
+    }
+  },
+
+  // ===== 更新顶部状态栏 =====
   updateStatusBar() {
     const state = GameState.get();
     document.getElementById('ticket-count').textContent = state.tickets;
@@ -81,7 +438,7 @@ const UI = {
     document.getElementById('collection-count').textContent = state.collection.length;
   },
 
-  // 渲染图鉴页
+  // ===== 图鉴页 =====
   renderCollection(filter = 'ALL') {
     const grid = document.getElementById('collection-grid');
     grid.innerHTML = '';
@@ -95,7 +452,6 @@ const UI = {
       const config = RARITY_CONFIG[char.rarity];
       const state = GameState.get();
 
-      // 获取该角色已收集的卡牌
       const collectedImages = char.images
         .map((img, idx) => ({ img, idx, uid: `${char.id}_${idx}` }))
         .filter(item => state.collection.includes(item.uid));
@@ -104,12 +460,25 @@ const UI = {
         ? collectedImages[0].img
         : null;
 
+      const isFullyLocked = collectedImages.length === 0;
+
       const el = document.createElement('div');
-      el.className = `collection-card card-${char.rarity.toLowerCase()}`;
+      el.className = `collection-card`;
+      if (isFullyLocked) {
+        el.classList.add('locked-card');
+        if (char.rarity !== 'SSR') {
+          el.classList.add('gray-locked');
+        } else {
+          el.classList.add('ssr-locked');
+        }
+      }
+
       el.innerHTML = `
         ${previewImg
           ? `<img src="${previewImg}" alt="${char.name}" loading="lazy">`
-          : `<div class="card-locked"><span>?</span></div>`
+          : `<div class="card-locked ${char.rarity.toLowerCase()}">
+               <span class="card-locked-icon">?</span>
+             </div>`
         }
         <div class="collection-info">
           <span class="collection-rarity" style="background:${config.color}">${config.label}</span>
@@ -126,46 +495,7 @@ const UI = {
     });
   },
 
-  // 角色画廊（展示该角色已收集的所有卡牌）
-  showCharacterGallery(char) {
-    const overlay = document.getElementById('detail-overlay');
-    const content = document.getElementById('detail-content');
-    const state = GameState.get();
-    const config = RARITY_CONFIG[char.rarity];
-    const progress = GachaEngine.getCharacterProgress(char.id);
-
-    const cardsHtml = char.images.map((img, idx) => {
-      const uid = `${char.id}_${idx}`;
-      const collected = state.collection.includes(uid);
-      if (collected) {
-        return `<div class="gallery-card" onclick="UI.showCardDetail({character:CHARACTERS.find(c=>c.id==='${char.id}'),image:'${img}',rarity:'${char.rarity}',cardUid:'${uid}',isDuplicate:false})">
-          <img src="${img}" loading="lazy">
-        </div>`;
-      }
-      return `<div class="gallery-card locked"><span>?</span></div>`;
-    }).join('');
-
-    content.innerHTML = `
-      <div class="gallery">
-        <div class="gallery-header">
-          <h2>${char.name}</h2>
-          <span class="detail-rarity" style="background:${config.color}">${config.label}</span>
-          <p>${char.description}</p>
-          <p class="gallery-progress">收集进度: ${progress.collected}/${progress.total} (${progress.percent}%)</p>
-        </div>
-        <div class="gallery-grid">${cardsHtml}</div>
-      </div>
-    `;
-
-    overlay.classList.add('active');
-    overlay.onclick = (e) => {
-      if (e.target === overlay || e.target.classList.contains('gallery')) {
-        overlay.classList.remove('active');
-      }
-    };
-  },
-
-  // 渲染任务页
+  // ===== 任务页 =====
   renderTasks() {
     const list = document.getElementById('task-list');
     const state = GameState.get();
@@ -196,7 +526,6 @@ const UI = {
         done: state.sharedWechat,
         action: () => {
           if (state.sharedWechat) return '已经分享过了';
-          // 尝试复制链接
           navigator.clipboard.writeText(window.location.href).then(() => {
             state.sharedWechat = true;
             state.tickets += 2;
@@ -300,7 +629,6 @@ const UI = {
       </div>
     `).join('');
 
-    // 保存任务引用
     this._tasks = tasks;
   },
 
@@ -309,7 +637,7 @@ const UI = {
     if (task) task.action();
   },
 
-  // 渲染商店页
+  // ===== 商店页 =====
   renderShop() {
     const list = document.getElementById('shop-list');
     const packs = [
@@ -331,7 +659,6 @@ const UI = {
       </div>
     `).join('');
 
-    // 金币换抽卡
     list.innerHTML += `
       <div class="shop-item shop-exchange">
         <div class="shop-info">
@@ -348,7 +675,6 @@ const UI = {
   },
 
   buyPack(id, coins) {
-    // 模拟购买
     const confirmed = confirm(`模拟购买：获得${coins}金币\n（实际支付功能开发中，当前为模拟充值）`);
     if (confirmed) {
       const state = GameState.get();
@@ -359,7 +685,7 @@ const UI = {
     }
   },
 
-  // Tab切换
+  // ===== Tab切换 =====
   switchTab(tab) {
     document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));

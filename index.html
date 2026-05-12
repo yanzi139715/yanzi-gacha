@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>妍子Cosplay抽卡集</title>
   <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 </head>
 <body>
   <!-- 顶部状态栏 -->
@@ -13,19 +14,19 @@
       <div class="brand">妍子Cos集</div>
       <div class="stats">
         <div class="stat" title="抽卡券">
-          <span class="stat-icon">&#x1F3AB;</span>
+          <svg class="stat-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
           <span id="ticket-count">0</span>
         </div>
         <div class="stat" title="金币">
-          <span class="stat-icon">&#x1FA99;</span>
+          <svg class="stat-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><text x="12" y="16" text-anchor="middle" fill="currentColor" stroke="none" font-size="11" font-weight="700">$</text></svg>
           <span id="coin-count">0</span>
         </div>
         <div class="stat" title="SSR保底">
-          <span class="stat-icon">&#x2B50;</span>
+          <svg class="stat-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12,2 15,9 22,9 16.5,14 18.5,21 12,17 5.5,21 7.5,14 2,9 9,9"/></svg>
           <span id="pity-count">0/90</span>
         </div>
         <div class="stat" title="已收集">
-          <span class="stat-icon">&#x1F4DA;</span>
+          <svg class="stat-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
           <span id="collection-count">0</span>
         </div>
       </div>
@@ -62,12 +63,12 @@
 
         <div class="gacha-buttons">
           <button id="btn-single" class="btn-pull btn-single">
-            <span class="btn-icon">&#x1F3B0;</span>
+            <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
             <span class="btn-text">单抽</span>
             <span class="btn-cost">1券/10金币</span>
           </button>
           <button id="btn-ten" class="btn-pull btn-ten">
-            <span class="btn-icon">&#x2728;</span>
+            <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             <span class="btn-text">十连抽</span>
             <span class="btn-cost">10券/100金币</span>
             <span class="btn-badge">保底SR</span>
@@ -75,7 +76,7 @@
         </div>
       </div>
 
-      <!-- 最近抽到的卡 -->
+      <!-- 当前卡池角色 -->
       <div class="recent-section">
         <h2>当前卡池角色</h2>
         <div class="char-preview" id="char-preview"></div>
@@ -119,33 +120,38 @@
   <!-- 底部导航 -->
   <nav class="bottom-nav">
     <button class="tab-btn active" data-tab="gacha">
-      <span class="nav-icon">&#x1F3B0;</span>
+      <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
       <span class="nav-label">抽卡</span>
     </button>
     <button class="tab-btn" data-tab="collection">
-      <span class="nav-icon">&#x1F4DA;</span>
+      <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><line x1="9" y1="7" x2="16" y2="7"/><line x1="9" y1="11" x2="14" y2="11"/></svg>
       <span class="nav-label">图鉴</span>
     </button>
     <button class="tab-btn" data-tab="tasks">
-      <span class="nav-icon">&#x2705;</span>
+      <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
       <span class="nav-label">任务</span>
     </button>
     <button class="tab-btn" data-tab="shop">
-      <span class="nav-icon">&#x1F6D2;</span>
+      <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
       <span class="nav-label">商店</span>
     </button>
   </nav>
 
   <!-- 抽卡结果弹窗 -->
   <div id="pull-overlay" class="overlay">
-    <div class="pull-results" id="pull-results"></div>
-    <p class="overlay-hint">点击任意处关闭</p>
+    <div class="pull-results-wrapper">
+      <div class="pull-results" id="pull-results"></div>
+      <p class="overlay-hint">点击卡片查看详情 | 点击背景关闭</p>
+    </div>
   </div>
 
   <!-- 卡牌详情弹窗 -->
   <div id="detail-overlay" class="overlay">
     <div id="detail-content" class="detail-content"></div>
   </div>
+
+  <!-- 海报生成用的隐藏Canvas -->
+  <canvas id="poster-canvas" style="display:none" width="750" height="1100"></canvas>
 
   <script src="js/cards.js"></script>
   <script src="js/gacha.js"></script>
