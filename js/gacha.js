@@ -9,7 +9,7 @@ const GachaEngine = {
     // 软保底：60抽后开始递增SSR概率
     let ssrProb = RARITY_CONFIG.SSR.prob;
     if (state.pityCount >= 60) {
-      ssrProb += (state.pityCount - 59) * 6; // 每抽+6%
+      ssrProb += (state.pityCount - 59) * 6;
     }
 
     if (rand < ssrProb) {
@@ -20,23 +20,16 @@ const GachaEngine = {
       rarity = 'R';
     }
 
-    // 从该稀有度角色中随机选一个
-    const pool = getCharactersByRarity(rarity);
-    const character = pool[Math.floor(Math.random() * pool.length)];
-
-    // 随机选一张该角色的图片
-    const imageIndex = Math.floor(Math.random() * character.images.length);
-    const image = character.images[imageIndex];
-
-    // 生成唯一卡牌ID
-    const cardUid = `${character.id}_${imageIndex}`;
+    // 从该稀有度的全部卡牌中随机选一张
+    const pool = getCardsByRarity(rarity);
+    const card = pool[Math.floor(Math.random() * pool.length)];
 
     // 检查是否重复
-    const isDuplicate = state.collection.includes(cardUid);
+    const isDuplicate = state.collection.includes(card.uid);
 
     // 更新状态
     if (!isDuplicate) {
-      state.collection.push(cardUid);
+      state.collection.push(card.uid);
     } else {
       state.coins += RARITY_CONFIG[rarity].coinValue;
     }
@@ -52,10 +45,13 @@ const GachaEngine = {
     GameState.save(state);
 
     return {
-      character,
-      image,
-      rarity,
-      cardUid,
+      uid: card.uid,
+      characterId: card.characterId,
+      characterName: card.characterName,
+      description: card.description,
+      image: card.src,
+      rarity: card.rarity,
+      imageIndex: card.imageIndex,
       isDuplicate,
       coinValue: isDuplicate ? RARITY_CONFIG[rarity].coinValue : 0
     };
@@ -81,7 +77,7 @@ const GachaEngine = {
   // 十连抽（保底至少1张SR）
   tenPull() {
     const state = GameState.get();
-    const cost = 10; // 10连抽 = 10张券 或 100金币
+    const cost = 10;
     let useTickets = Math.min(state.tickets, cost);
     let useCoins = (cost - useTickets) * 10;
 
@@ -102,52 +98,54 @@ const GachaEngine = {
       if (card.rarity === 'SR' || card.rarity === 'SSR') hasSR = true;
     }
 
-    // 保底SR：如果10张没有SR/R以上，强制替换最后一张
+    // 保底SR
     if (!hasSR) {
-      const srPool = getCharactersByRarity('SR');
-      const character = srPool[Math.floor(Math.random() * srPool.length)];
-      const imageIndex = Math.floor(Math.random() * character.images.length);
-      const image = character.images[imageIndex];
-      const cardUid = `${character.id}_${imageIndex}`;
-      const isDuplicate = state.collection.includes(cardUid);
+      const srPool = getCardsByRarity('SR');
+      const guaranteed = srPool[Math.floor(Math.random() * srPool.length)];
+      const isDuplicate = state.collection.includes(guaranteed.uid);
 
       if (!isDuplicate) {
-        state.collection.push(cardUid);
+        state.collection.push(guaranteed.uid);
       } else {
         state.coins += RARITY_CONFIG.SR.coinValue;
       }
       GameState.save(state);
 
-      cards[9] = { character, image, rarity: 'SR', cardUid, isDuplicate, coinValue: isDuplicate ? RARITY_CONFIG.SR.coinValue : 0 };
+      cards[9] = {
+        uid: guaranteed.uid,
+        characterId: guaranteed.characterId,
+        characterName: guaranteed.characterName,
+        description: guaranteed.description,
+        image: guaranteed.src,
+        rarity: 'SR',
+        imageIndex: guaranteed.imageIndex,
+        isDuplicate,
+        coinValue: isDuplicate ? RARITY_CONFIG.SR.coinValue : 0
+      };
     }
 
     return { success: true, cards };
   },
 
-  // 获取所有已收集的角色（去重）
-  getCollectedCharacters() {
-    const state = GameState.get();
-    const collected = {};
-    state.collection.forEach(uid => {
-      const charId = uid.split('_')[0];
-      if (!collected[charId]) collected[charId] = 0;
-      collected[charId]++;
-    });
-    return collected;
-  },
-
   // 获取角色收集进度
   getCharacterProgress(charId) {
-    const character = getCharacterById(charId);
-    if (!character) return { total: 0, collected: 0, percent: 0 };
+    const allCards = getCardsByCharacter(charId);
     const state = GameState.get();
-    const collected = character.images.filter((_, idx) =>
-      state.collection.includes(`${charId}_${idx}`)
-    ).length;
+    const collected = allCards.filter(c => state.collection.includes(c.uid)).length;
     return {
-      total: character.images.length,
+      total: allCards.length,
       collected,
-      percent: Math.round((collected / character.images.length) * 100)
+      percent: allCards.length > 0 ? Math.round((collected / allCards.length) * 100) : 0
     };
+  },
+
+  // 获取角色已收集的卡牌列表
+  getCollectedCardsForCharacter(charId) {
+    const allCards = getCardsByCharacter(charId);
+    const state = GameState.get();
+    return allCards.map(c => ({
+      ...c,
+      collected: state.collection.includes(c.uid)
+    }));
   }
 };

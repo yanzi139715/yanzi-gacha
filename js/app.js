@@ -102,22 +102,21 @@ const app = {
   },
 
   renderBanner() {
-    // 显示一个SSR卡牌作为Banner
-    const ssrChars = getCharactersByRarity('SSR');
-    if (ssrChars.length > 0) {
+    const ssrCards = getCardsByRarity('SSR');
+    if (ssrCards.length > 0) {
       const banner = document.getElementById('banner');
-      banner.style.backgroundImage = `url(${ssrChars[0].images[0]})`;
+      banner.style.backgroundImage = `url(${ssrCards[0].src})`;
     }
   },
 
   renderCharPreview() {
     const container = document.getElementById('char-preview');
     container.innerHTML = CHARACTERS.map(char => {
-      const config = RARITY_CONFIG[char.rarity];
-      return `<div class="char-thumb ${char.rarity.toLowerCase()}"
+      const thumb = getCharacterThumb(char.id);
+      return `<div class="char-thumb"
                    onclick="UI.showCharacterGallery(CHARACTERS.find(c=>c.id==='${char.id}'))"
-                   title="${char.name} [${config.label}]">
-        <img src="${char.images[0]}" alt="${char.name}" loading="lazy">
+                   title="${char.name}">
+        <img src="${thumb}" alt="${char.name}" loading="lazy">
       </div>`;
     }).join('');
   }
