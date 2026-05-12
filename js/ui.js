@@ -464,7 +464,12 @@ const UI = {
 
       const el = document.createElement('div');
       el.className = `collection-card`;
-      if (isFullyLocked) {
+
+      // 始终显示角色第一张图，未解锁时加灰色滤镜
+      const thumbImg = char.images[0];
+      const hasAny = collectedImages.length > 0;
+
+      if (!hasAny) {
         el.classList.add('locked-card');
         if (char.rarity !== 'SSR') {
           el.classList.add('gray-locked');
@@ -474,12 +479,10 @@ const UI = {
       }
 
       el.innerHTML = `
-        ${previewImg
-          ? `<img src="${previewImg}" alt="${char.name}" loading="lazy">`
-          : `<div class="card-locked ${char.rarity.toLowerCase()}">
-               <span class="card-locked-icon">?</span>
-             </div>`
-        }
+        <div class="collection-thumb" style="position:relative">
+          <img src="${thumbImg}" alt="${char.name}" loading="lazy">
+          ${!hasAny ? `<div class="lock-overlay"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>` : ''}
+        </div>
         <div class="collection-info">
           <span class="collection-rarity" style="background:${config.color}">${config.label}</span>
           <span class="collection-name">${char.name}</span>

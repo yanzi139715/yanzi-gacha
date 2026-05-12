@@ -298,13 +298,45 @@ html, body {
 
 .collection-card:active { transform: scale(0.97); }
 
-.collection-card img {
+.collection-card > .collection-thumb {
+  width: 100%;
+}
+
+/* 未解锁卡牌 - 显示原图但灰色滤镜 + 锁图标 */
+.collection-thumb {
+  position: relative;
   width: 100%;
   aspect-ratio: 3/4;
+  overflow: hidden;
+}
+
+.collection-thumb img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 
-/* 未解锁卡牌 - SSR保持神秘金色剪影，SR/R灰色 */
+/* 灰色滤镜 - SR/R未解锁卡 */
+.collection-card.locked-card.gray-locked .collection-thumb img {
+  filter: grayscale(1) brightness(0.35) contrast(0.9);
+}
+
+/* SSR未解锁 - 保留金色调，微暗 */
+.collection-card.locked-card.ssr-locked .collection-thumb img {
+  filter: brightness(0.45) saturate(0.6) sepia(0.3);
+}
+
+/* 锁图标遮罩 */
+.lock-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.25);
+}
+
+/* 旧的card-locked样式保留（画廊中用） */
 .card-locked {
   width: 100%;
   aspect-ratio: 3/4;
@@ -326,25 +358,6 @@ html, body {
 .card-locked.r {
   background: linear-gradient(135deg, #0a1520, #0a1a2a);
   color: rgba(79,195,247,0.15);
-}
-
-.card-locked-icon {
-  font-size: 28px;
-  filter: grayscale(1);
-}
-
-.card-locked.ssr .card-locked-icon {
-  filter: grayscale(0);
-  color: rgba(255,215,0,0.3);
-}
-
-/* 灰色滤镜 - 未解锁的非SSR卡在图鉴中显示灰色 */
-.collection-card.locked-card img {
-  filter: grayscale(1) brightness(0.4);
-}
-
-.collection-card.locked-card.ssr-locked img {
-  filter: grayscale(0) brightness(0.5);
 }
 
 .collection-info {
@@ -533,14 +546,28 @@ html, body {
   background: rgba(0,0,0,0.88);
   z-index: 200;
   display: none;
-  align-items: center; justify-content: center;
   flex-direction: column;
-  padding: 20px;
+  align-items: center;
+  padding: 40px 16px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .overlay.active {
   display: flex;
+}
+
+/* 用伪元素实现垂直居中（内容超出时从顶部开始滚动） */
+.overlay::before {
+  content: '';
+  flex: 1 0 auto;
+  min-height: 20px;
+}
+
+.overlay::after {
+  content: '';
+  flex: 1 0 auto;
+  min-height: 20px;
 }
 
 .overlay-hint {
@@ -841,19 +868,13 @@ html, body {
   font-size: 24px;
 }
 
-/* 画廊中已收集卡片的操作按钮 */
+/* 画廊中已收集卡片的操作按钮 - 始终显示 */
 .gallery-card-actions {
   position: absolute;
   bottom: 0; left: 0; right: 0;
   display: flex;
-  background: rgba(0,0,0,0.7);
-  transform: translateY(100%);
-  transition: transform 0.2s;
-}
-
-.gallery-card:hover .gallery-card-actions,
-.gallery-card:active .gallery-card-actions {
-  transform: translateY(0);
+  background: linear-gradient(transparent, rgba(0,0,0,0.75));
+  padding-top: 12px;
 }
 
 .gallery-action-btn {
