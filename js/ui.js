@@ -116,11 +116,19 @@ const UI = {
   _showCards(cards, container) {
     container.innerHTML = '';
     const isTenPull = cards.length > 1;
+    const hasMystery = cards.some(c => c.rarity !== 'R');
 
     cards.forEach((card, index) => {
       const cardEl = this.createCardElement(card, true);
       const rarityClass = `${card.rarity.toLowerCase()}-card`;
       cardEl.classList.add(rarityClass);
+
+      if (card.rarity !== 'R') {
+        cardEl.classList.add('mystery-card');
+      } else if (hasMystery) {
+        cardEl.classList.add('plain-card');
+      }
+
       if (isTenPull) {
         cardEl.classList.add(`card-delay-${index + 1}`);
       }
@@ -134,10 +142,11 @@ const UI = {
     if (withAnimation) el.classList.add('card-reveal');
 
     const config = RARITY_CONFIG[card.rarity];
+    const showMystery = withAnimation && card.rarity !== 'R';
 
     el.innerHTML = `
       <div class="card-inner">
-        ${withAnimation ? `<div class="card-back"><span class="mystery-icon">?</span></div>` : ''}
+        ${showMystery ? `<div class="card-back"><span class="mystery-icon">?</span></div>` : ''}
         <div class="card-front">
           <img src="${card.image}" alt="${card.characterName}" loading="lazy">
           <div class="card-info">
