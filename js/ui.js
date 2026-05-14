@@ -488,9 +488,13 @@ const UI = {
   // ===== 顶部状态栏 =====
   updateStatusBar() {
     const state = GameState.get();
+    const poolId = state.currentPool || 'standard';
+    const pool = POOL_CONFIG[poolId];
+    const pity = GachaEngine.getPity(poolId);
+
     document.getElementById('ticket-count').textContent = state.tickets;
     document.getElementById('coin-count').textContent = state.coins;
-    document.getElementById('pity-count').textContent = `${state.pityCount}/90`;
+    document.getElementById('pity-count').textContent = `${pity}/${pool ? pool.pityLimit : 90}`;
     document.getElementById('collection-count').textContent = state.collection.length;
   },
 
@@ -634,13 +638,18 @@ const UI = {
   // ===== 商店页 =====
   renderShop() {
     const list = document.getElementById('shop-list');
+    const state = GameState.get();
+
     const packs = [
       { id: 'small', name: '初遇之礼', coins: 60, price: '¥6', desc: '60金币，可抽6次' },
       { id: 'medium', name: '心动礼包', coins: 330, price: '¥30', desc: '330金币，超值加赠' },
       { id: 'large', name: '挚爱礼盒', coins: 1100, price: '¥98', desc: '1100金币，豪华加赠' }
     ];
 
-    list.innerHTML = packs.map(p => `
+    // 检查有限定池
+    const hasLimited = Object.values(POOL_CONFIG).some(p => p.type === 'limited');
+
+    let html = packs.map(p => `
       <div class="shop-item">
         <div class="shop-info">
           <h3>${p.name}</h3>
@@ -649,7 +658,54 @@ const UI = {
         </div>
         <button class="shop-btn" onclick="UI.buyPack('${p.id}',${p.coins})">${p.price}</button>
       </div>
-    `).join('') + `
+    `).join('');
+
+    // 限定池专属券
+    if (hasLimited) {
+      const limitedPacks = [
+        { id: 'ticket-1', name: '限定单抽券', tickets: 1, price: '¥3', desc: '限定池专用抽卡券×1' },
+        { id: 'ticket-10', name: '限定十连券', tickets: 10, price: '¥25', desc: '限定池专用抽卡券×10，优惠价' }
+      ];
+
+      html += `<div class="shop-section-title">限定池专属券</div>`;
+      html += limitedPacks.map(p => `
+        <div class="shop-item shop-item-limited">
+          <div class="shop-info">
+            <h3>${p.name}</h3>
+            <p>${p.desc}</p>
+            <span class="shop-coins">拥有: ${state.ticket_limited || 0} 张</span>
+          </div>
+          <button class="shop-btn shop-btn-limited" onclick="UI.buyTicket('${p.id}',${p.tickets})">${p.price}</button>
+        </div>
+      `).join('');
+    }
+
+    // 当前券数量总览
+    html += `
+      <div class="shop-section-title">持有资产</div>
+      <div class="shop-assets">
+        <div class="asset-item">
+          <span class="asset-label">通用券</span>
+          <span class="asset-value">${state.tickets}</span>
+        </div>
+        <div class="asset-item">
+          <span class="asset-label">限定券</span>
+          <span class="asset-value">${state.ticket_limited || 0}</span>
+        </div>
+        <div class="asset-item">
+          <span class="asset-label">兔女郎券</span>
+          <span class="asset-value">${state.ticket_bunny || 0}</span>
+        </div>
+        <div class="asset-item">
+          <span class="asset-label">金币</span>
+          <span class="asset-value">${state.coins}</span>
+        </div>
+      </div>
+    `;
+
+    // 金币抽卡快捷入口
+    html += `
+      <div class="shop-section-title">金币抽卡</div>
       <div class="shop-item">
         <div class="shop-info">
           <h3>金币抽卡</h3>
@@ -662,6 +718,19 @@ const UI = {
         </div>
       </div>
     `;
+
+    list.innerHTML = html;
+  },
+
+  buyTicket(id, tickets) {
+    if (confirm(`模拟购买：获得${tickets}张限定池专属券（支付功能开发中）`)) {
+      const state = GameState.get();
+      state.ticket_limited = (state.ticket_limited || 0) + tickets;
+      GameState.save(state);
+      this.updateStatusBar();
+      this.renderShop();
+      alert(`购买成功！+${tickets}张限定池专属券`);
+    }
   },
 
   buyPack(id, coins) {

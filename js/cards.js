@@ -297,6 +297,244 @@ const CHARACTERS = [
       { src: 'img/花园白雪之仪/9.jpg', rarity: 'R' },
       { src: 'img/花园白雪之仪/10.jpg', rarity: 'R' }
     ]
+  },
+  {
+    id: 'katixiya',
+    name: '卡提希娅',
+    description: '限定UP角色·卡提希娅，神秘优雅的异世界少女',
+    images: [
+      { src: 'img/卡提希娅/DSC_8497.jpg', rarity: 'SSR' },
+      { src: 'img/卡提希娅/DSC_8498.jpg', rarity: 'SSR' },
+      { src: 'img/卡提希娅/DSC_8500.jpg', rarity: 'SR' },
+      { src: 'img/卡提希娅/DSC_8501.jpg', rarity: 'SR' },
+      { src: 'img/卡提希娅/DSC_8504.jpg', rarity: 'SR' },
+      { src: 'img/卡提希娅/DSC_8505.jpg', rarity: 'SR' },
+      { src: 'img/卡提希娅/DSC_8506.jpg', rarity: 'R' },
+      { src: 'img/卡提希娅/DSC_8508.jpg', rarity: 'R' },
+      { src: 'img/卡提希娅/DSC_8510.jpg', rarity: 'R' },
+      { src: 'img/卡提希娅/DSC_8518.jpg', rarity: 'R' },
+      { src: 'img/卡提希娅/DSC_8522.jpg', rarity: 'R' },
+      { src: 'img/卡提希娅/DSC_8529.jpg', rarity: 'R' },
+      { src: 'img/卡提希娅/DSC_8532.jpg', rarity: 'R' },
+      { src: 'img/卡提希娅/DSC_8543.jpg', rarity: 'R' }
+    ]
+  },
+  {
+    id: 'bunny-02',
+    name: '02·兔女郎',
+    description: '《DARLING in the FRANXX》02兔女郎造型，魅惑与可爱并存',
+    images: [
+      { src: 'img/兔女郎合集/02兔女郎/2J0A7957.jpg', rarity: 'SSR' },
+      { src: 'img/兔女郎合集/02兔女郎/2J0A7959.jpg', rarity: 'SSR' },
+      { src: 'img/兔女郎合集/02兔女郎/2J0A7963.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/02兔女郎/2J0A7966.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/02兔女郎/2J0A7977.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/02兔女郎/2J0A7979.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/02兔女郎/2J0A7981.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/02兔女郎/2J0A7995.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/02兔女郎/2J0A8001.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/02兔女郎/2J0A8004.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/02兔女郎/2J0A8007.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/02兔女郎/2J0A8010.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/02兔女郎/2J0A8019.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/02兔女郎/2J0A8022.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/02兔女郎/2J0A8023.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/02兔女郎/2J0A8031.jpg', rarity: 'R' }
+    ],
+    pool: 'bunny'
+  },
+  {
+    id: 'bunny-miku',
+    name: '初音·兔女郎',
+    description: '初音未来兔女郎造型，电音女王的性感演绎',
+    images: [
+      { src: 'img/兔女郎合集/初音兔女郎/2J0A7403.jpg', rarity: 'SSR' },
+      { src: 'img/兔女郎合集/初音兔女郎/2J0A7404.jpg', rarity: 'SSR' },
+      { src: 'img/兔女郎合集/初音兔女郎/2J0A7407.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/初音兔女郎/2J0A7414.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/初音兔女郎/2J0A7416.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/初音兔女郎/2J0A7418.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/初音兔女郎/2J0A7421.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/初音兔女郎/2J0A7426.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/初音兔女郎/2J0A7427.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/初音兔女郎/2J0A7428.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/初音兔女郎/2J0A7432.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/初音兔女郎/2J0A7434.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/初音兔女郎/2J0A7441.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/初音兔女郎/2J0A7442.jpg', rarity: 'R' }
+    ],
+    pool: 'bunny'
+  },
+  {
+    id: 'bunny-kato',
+    name: '加藤惠·兔女郎',
+    description: '《路人女主的养成方法》加藤惠兔女郎造型，低调的魅惑',
+    images: [
+      { src: 'img/兔女郎合集/加藤惠兔女郎/2J0A7786.jpg', rarity: 'SSR' },
+      { src: 'img/兔女郎合集/加藤惠兔女郎/2J0A7789.jpg', rarity: 'SSR' },
+      { src: 'img/兔女郎合集/加藤惠兔女郎/2J0A7791.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/加藤惠兔女郎/2J0A7792.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/加藤惠兔女郎/2J0A7798.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/加藤惠兔女郎/2J0A7799.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/加藤惠兔女郎/2J0A7802.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/加藤惠兔女郎/2J0A7803.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/加藤惠兔女郎/2J0A7804.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/加藤惠兔女郎/2J0A7817.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/加藤惠兔女郎/2J0A7819.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/加藤惠兔女郎/2J0A7820.JPG', rarity: 'R' },
+      { src: 'img/兔女郎合集/加藤惠兔女郎/2J0A7823.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/加藤惠兔女郎/2J0A7824.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/加藤惠兔女郎/2J0A7842.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/加藤惠兔女郎/2J0A7844.jpg', rarity: 'R' }
+    ],
+    pool: 'bunny'
+  },
+  {
+    id: 'bunny-scathach',
+    name: '斯卡哈·兔女郎',
+    description: '《Fate/Grand Order》斯卡哈兔女郎造型，影之女王的魅影',
+    images: [
+      { src: 'img/兔女郎合集/斯卡哈兔女郎/2J0A7870.JPG', rarity: 'SSR' },
+      { src: 'img/兔女郎合集/斯卡哈兔女郎/2J0A7871.jpg', rarity: 'SSR' },
+      { src: 'img/兔女郎合集/斯卡哈兔女郎/2J0A7874.JPG', rarity: 'SR' },
+      { src: 'img/兔女郎合集/斯卡哈兔女郎/2J0A7878.JPG', rarity: 'SR' },
+      { src: 'img/兔女郎合集/斯卡哈兔女郎/2J0A7880.JPG', rarity: 'SR' },
+      { src: 'img/兔女郎合集/斯卡哈兔女郎/2J0A7886.JPG', rarity: 'SR' },
+      { src: 'img/兔女郎合集/斯卡哈兔女郎/2J0A7894.JPG', rarity: 'R' },
+      { src: 'img/兔女郎合集/斯卡哈兔女郎/2J0A7900.JPG', rarity: 'R' },
+      { src: 'img/兔女郎合集/斯卡哈兔女郎/2J0A7904.JPG', rarity: 'R' },
+      { src: 'img/兔女郎合集/斯卡哈兔女郎/2J0A7906.JPG', rarity: 'R' },
+      { src: 'img/兔女郎合集/斯卡哈兔女郎/2J0A7909.JPG', rarity: 'R' },
+      { src: 'img/兔女郎合集/斯卡哈兔女郎/2J0A7910.JPG', rarity: 'R' },
+      { src: 'img/兔女郎合集/斯卡哈兔女郎/2J0A7913.JPG', rarity: 'R' },
+      { src: 'img/兔女郎合集/斯卡哈兔女郎/2J0A7915.JPG', rarity: 'R' },
+      { src: 'img/兔女郎合集/斯卡哈兔女郎/2J0A7921.JPG', rarity: 'R' },
+      { src: 'img/兔女郎合集/斯卡哈兔女郎/2J0A7927.JPG', rarity: 'R' }
+    ],
+    pool: 'bunny'
+  },
+  {
+    id: 'bunny-atago',
+    name: '爱宕·兔女郎',
+    description: '《碧蓝航线》爱宕兔女郎造型，温柔姐姐的甜蜜诱惑',
+    images: [
+      { src: 'img/兔女郎合集/爱宕兔女郎/3YSY0444.jpg', rarity: 'SSR' },
+      { src: 'img/兔女郎合集/爱宕兔女郎/3YSY0457.jpg', rarity: 'SSR' },
+      { src: 'img/兔女郎合集/爱宕兔女郎/3YSY0479.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/爱宕兔女郎/3YSY0486.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/爱宕兔女郎/3YSY0489.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/爱宕兔女郎/3YSY0496.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/爱宕兔女郎/3YSY0508.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/爱宕兔女郎/3YSY0521.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/爱宕兔女郎/3YSY0524.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/爱宕兔女郎/3YSY0531.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/爱宕兔女郎/3YSY0543.jpg', rarity: 'R' }
+    ],
+    pool: 'bunny'
+  },
+  {
+    id: 'bunny-shinobu',
+    name: '蝴蝶忍·兔女郎',
+    description: '《鬼灭之刃》蝴蝶忍兔女郎造型，温柔中藏着致命毒刃',
+    images: [
+      { src: 'img/兔女郎合集/蝴蝶忍兔女郎/2J0A7452.jpg', rarity: 'SSR' },
+      { src: 'img/兔女郎合集/蝴蝶忍兔女郎/2J0A7457.jpg', rarity: 'SSR' },
+      { src: 'img/兔女郎合集/蝴蝶忍兔女郎/2J0A7458.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/蝴蝶忍兔女郎/2J0A7466.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/蝴蝶忍兔女郎/2J0A7473.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/蝴蝶忍兔女郎/2J0A7475.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/蝴蝶忍兔女郎/2J0A7476.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/蝴蝶忍兔女郎/2J0A7477.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/蝴蝶忍兔女郎/2J0A7479.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/蝴蝶忍兔女郎/2J0A7480.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/蝴蝶忍兔女郎/2J0A7482.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/蝴蝶忍兔女郎/2J0A7483.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/蝴蝶忍兔女郎/2J0A7491.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/蝴蝶忍兔女郎/2J0A7494.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/蝴蝶忍兔女郎/2J0A7495.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/蝴蝶忍兔女郎/2J0A7498.jpg', rarity: 'R' }
+    ],
+    pool: 'bunny'
+  },
+  {
+    id: 'bunny-ahri',
+    name: '阿狸·兔女郎',
+    description: '《英雄联盟》阿狸兔女郎造型，九尾妖狐的魅惑之夜',
+    images: [
+      { src: 'img/兔女郎合集/阿狸兔女郎/2J0A7542.jpg', rarity: 'SSR' },
+      { src: 'img/兔女郎合集/阿狸兔女郎/2J0A7543.jpg', rarity: 'SSR' },
+      { src: 'img/兔女郎合集/阿狸兔女郎/2J0A7545.jpg', rarity: 'SSR' },
+      { src: 'img/兔女郎合集/阿狸兔女郎/2J0A7549.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/阿狸兔女郎/2J0A7551.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/阿狸兔女郎/2J0A7553.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/阿狸兔女郎/2J0A7554.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/阿狸兔女郎/2J0A7564.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/阿狸兔女郎/2J0A7567.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/阿狸兔女郎/2J0A7570.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/阿狸兔女郎/2J0A7572.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/阿狸兔女郎/2J0A7574.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/阿狸兔女郎/2J0A7588.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/阿狸兔女郎/2J0A7589.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/阿狸兔女郎/2J0A7590.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/阿狸兔女郎/2J0A7591.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/阿狸兔女郎/2J0A7593.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/阿狸兔女郎/2J0A7599.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/阿狸兔女郎/2J0A7602.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/阿狸兔女郎/2J0A7603.jpg', rarity: 'R' }
+    ],
+    pool: 'bunny'
+  },
+  {
+    id: 'bunny-mai',
+    name: '麻衣·兔女郎',
+    description: '《青春猪头少年》樱岛麻衣兔女郎造型，学姐的经典魅力',
+    images: [
+      { src: 'img/兔女郎合集/麻衣兔女郎/2J0A7710.jpg', rarity: 'SSR' },
+      { src: 'img/兔女郎合集/麻衣兔女郎/2J0A7712.jpg', rarity: 'SSR' },
+      { src: 'img/兔女郎合集/麻衣兔女郎/2J0A7713.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/麻衣兔女郎/2J0A7715.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/麻衣兔女郎/2J0A7721.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/麻衣兔女郎/2J0A7725.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/麻衣兔女郎/2J0A7729.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/麻衣兔女郎/2J0A7731.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/麻衣兔女郎/2J0A7733.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/麻衣兔女郎/2J0A7735.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/麻衣兔女郎/2J0A7736.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/麻衣兔女郎/2J0A7738.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/麻衣兔女郎/2J0A7742.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/麻衣兔女郎/2J0A7755.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/麻衣兔女郎/2J0A7761.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/麻衣兔女郎/2J0A7766.jpg', rarity: 'R' }
+    ],
+    pool: 'bunny'
+  },
+  {
+    id: 'bunny-lancer',
+    name: '黑枪呆·兔女郎',
+    description: '《Fate》阿尔托莉雅·潘德拉贡兔女郎造型，王者的午夜盛宴',
+    images: [
+      { src: 'img/兔女郎合集/黑枪呆兔女郎/2J0A7511.jpg', rarity: 'SSR' },
+      { src: 'img/兔女郎合集/黑枪呆兔女郎/2J0A7512.jpg', rarity: 'SSR' },
+      { src: 'img/兔女郎合集/黑枪呆兔女郎/2J0A7513.jpg', rarity: 'SSR' },
+      { src: 'img/兔女郎合集/黑枪呆兔女郎/2J0A7516.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/黑枪呆兔女郎/2J0A7517.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/黑枪呆兔女郎/2J0A7524.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/黑枪呆兔女郎/2J0A7615.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/黑枪呆兔女郎/2J0A7618.jpg', rarity: 'SR' },
+      { src: 'img/兔女郎合集/黑枪呆兔女郎/2J0A7621 (1).jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/黑枪呆兔女郎/2J0A7621 (2).jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/黑枪呆兔女郎/2J0A7623.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/黑枪呆兔女郎/2J0A7629.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/黑枪呆兔女郎/2J0A7632.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/黑枪呆兔女郎/2J0A7634.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/黑枪呆兔女郎/2J0A7641.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/黑枪呆兔女郎/2J0A7643.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/黑枪呆兔女郎/2J0A7647.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/黑枪呆兔女郎/2J0A7651.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/黑枪呆兔女郎/2J0A7662.jpg', rarity: 'R' },
+      { src: 'img/兔女郎合集/黑枪呆兔女郎/2J0A7663.jpg', rarity: 'R' }
+    ],
+    pool: 'bunny'
   }
 ];
 
@@ -348,3 +586,80 @@ function getCharacterThumb(charId) {
   const ssr = char.images.find(i => i.rarity === 'SSR');
   return (ssr || char.images[0]).src;
 }
+
+// 获取属于某个卡池的角色
+function getCharactersByPool(poolId) {
+  if (poolId === 'standard') return CHARACTERS.filter(c => !c.pool);
+  return CHARACTERS.filter(c => c.pool === poolId);
+}
+
+// 从指定卡池获取指定稀有度的卡牌
+function getCardsByRarityInPool(rarity, poolId) {
+  const chars = getCharactersByPool(poolId);
+  const cards = [];
+  chars.forEach(char => {
+    char.images.forEach((img, idx) => {
+      if (img.rarity === rarity) {
+        cards.push({
+          characterId: char.id,
+          characterName: char.name,
+          description: char.description,
+          imageIndex: idx,
+          src: img.src,
+          rarity: img.rarity,
+          uid: `${char.id}_${idx}`
+        });
+      }
+    });
+  });
+  return cards;
+}
+
+// 卡池配置
+const POOL_CONFIG = {
+  standard: {
+    id: 'standard',
+    name: '混池',
+    subtitle: '常驻卡池',
+    description: '包含所有常驻角色，经典永不落幕',
+    type: 'permanent',
+    cost: 1,
+    pityLimit: 90,
+    softPityStart: 60,
+    softPityRate: 6,
+    rateUpCharId: null,
+    rateUpFraction: 0,
+    bgImage: null
+  },
+  limited: {
+    id: 'limited',
+    name: '卡提希娅限定池',
+    subtitle: '限时UP',
+    description: '限定角色卡提希娅概率UP！错过不再有',
+    type: 'limited',
+    cost: 1,
+    pityLimit: 80,
+    softPityStart: 50,
+    softPityRate: 7,
+    rateUpCharId: 'katixiya',
+    rateUpFraction: 0.5,
+    bgImage: 'img/卡提希娅/DSC_8497.jpg',
+    startDate: '2026-05-14',
+    endDate: '2026-05-28'
+  },
+  bunny: {
+    id: 'bunny',
+    name: '兔女郎池',
+    subtitle: '常驻·轮换UP',
+    description: '兔女郎系列专属卡池，每期轮换UP角色',
+    type: 'permanent',
+    cost: 1,
+    pityLimit: 90,
+    softPityStart: 60,
+    softPityRate: 6,
+    rateUpCharId: 'bunny-mai',
+    rateUpFraction: 2/3,
+    bgImage: null,
+    rotationOrder: ['bunny-mai', 'bunny-ahri', 'bunny-shinobu', 'bunny-scathach', 'bunny-kato', 'bunny-miku', 'bunny-02', 'bunny-atago', 'bunny-lancer']
+  }
+};

@@ -40,12 +40,22 @@
     <section id="page-gacha" class="tab-page active">
       <div class="banner" id="banner">
         <div class="banner-overlay">
-          <h1>妍子Cosplay抽卡集</h1>
-          <p>收集你的本命角色卡牌</p>
+          <h1 id="pool-title">妍子Cosplay抽卡集</h1>
+          <p id="pool-subtitle">收集你的本命角色卡牌</p>
+          <div id="pool-countdown" class="pool-countdown" style="display:none"></div>
         </div>
       </div>
 
+      <!-- 卡池切换 -->
+      <div class="pool-tabs" id="pool-tabs"></div>
+
       <div class="gacha-pool">
+        <div class="pity-display">
+          <div id="pity-counter" class="pity-counter">距保底: 0/90</div>
+          <div id="soft-pity-hint" class="soft-pity-hint" style="display:none"></div>
+        </div>
+        <div id="pool-expired-msg" class="pool-expired" style="display:none"></div>
+
         <div class="pool-visual">
           <div class="pool-card pool-ssr">
             <span>SSR</span>

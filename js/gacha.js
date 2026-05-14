@@ -1,16 +1,40 @@
-// 抽卡引擎
+// 抽卡引擎 - 多池版本
 const GachaEngine = {
-  // 抽取一张卡
-  pull() {
+  // 获取卡池的保底计数key
+  pityKey(poolId) {
+    return `pity_${poolId}`;
+  },
+
+  // 获取卡池保底计数
+  getPity(poolId) {
     const state = GameState.get();
+    return state[this.pityKey(poolId)] || 0;
+  },
+
+  // 设置卡池保底计数
+  setPity(poolId, count) {
+    const state = GameState.get();
+    state[this.pityKey(poolId)] = count;
+    GameState.save(state);
+  },
+
+  // 从指定卡池抽取一张卡
+  pull(poolId) {
+    const pool = POOL_CONFIG[poolId];
+    if (!pool) return null;
+
+    const state = GameState.get();
+    const pityKey = this.pityKey(poolId);
+    const pityCount = state[pityKey] || 0;
+
+    // 计算SSR概率（含软保底）
+    let ssrProb = RARITY_CONFIG.SSR.prob;
+    if (pityCount >= pool.softPityStart) {
+      ssrProb += (pityCount - pool.softPityStart + 1) * pool.softPityRate;
+    }
+
     const rand = Math.random() * 100;
     let rarity;
-
-    // 软保底：60抽后开始递增SSR概率
-    let ssrProb = RARITY_CONFIG.SSR.prob;
-    if (state.pityCount >= 60) {
-      ssrProb += (state.pityCount - 59) * 6;
-    }
 
     if (rand < ssrProb) {
       rarity = 'SSR';
@@ -20,9 +44,45 @@ const GachaEngine = {
       rarity = 'R';
     }
 
-    // 从该稀有度的全部卡牌中随机选一张
-    const pool = getCardsByRarity(rarity);
-    const card = pool[Math.floor(Math.random() * pool.length)];
+    // 选择卡牌
+    let card;
+    const hasRateUp = pool.rateUpCharId && pool.rateUpFraction > 0;
+
+    if (hasRateUp) {
+      // 有UP角色的卡池：按概率决定是否出UP角色
+      const upRoll = Math.random();
+      if (upRoll < pool.rateUpFraction) {
+        // 出UP角色的该稀有度卡牌
+        const upChar = getCharacterById(pool.rateUpCharId);
+        const upCards = upChar.images
+          .map((img, idx) => ({
+            characterId: upChar.id,
+            characterName: upChar.name,
+            description: upChar.description,
+            imageIndex: idx,
+            src: img.src,
+            rarity: img.rarity,
+            uid: `${upChar.id}_${idx}`
+          }))
+          .filter(c => c.rarity === rarity);
+
+        if (upCards.length > 0) {
+          card = upCards[Math.floor(Math.random() * upCards.length)];
+        }
+      }
+    }
+
+    // 非UP或UP角色没有该稀有度的卡，从整个卡池该稀有度中选
+    if (!card) {
+      const poolCards = getCardsByRarityInPool(rarity, poolId);
+      if (poolCards.length > 0) {
+        card = poolCards[Math.floor(Math.random() * poolCards.length)];
+      } else {
+        // fallback: 从整个卡池随机选（不应发生）
+        const allPoolCards = getCardsByRarityInPool('R', poolId);
+        card = allPoolCards[Math.floor(Math.random() * allPoolCards.length)];
+      }
+    }
 
     // 检查是否重复
     const isDuplicate = state.collection.includes(card.uid);
@@ -36,9 +96,9 @@ const GachaEngine = {
 
     // 更新保底计数
     if (rarity === 'SSR') {
-      state.pityCount = 0;
+      state[pityKey] = 0;
     } else {
-      state.pityCount++;
+      state[pityKey] = (state[pityKey] || 0) + 1;
     }
 
     state.totalPulls++;
@@ -58,34 +118,56 @@ const GachaEngine = {
   },
 
   // 单抽
-  singlePull() {
+  singlePull(poolId) {
+    const pool = POOL_CONFIG[poolId];
+    if (!pool) return { success: false, reason: '卡池不存在' };
+
     const state = GameState.get();
-    if (state.tickets <= 0 && state.coins < 10) {
+    const ticketKey = `ticket_${poolId}`;
+    const hasTicket = (state[ticketKey] || 0) > 0;
+    const hasUniversalTicket = (state.tickets || 0) > 0;
+
+    if (!hasTicket && !hasUniversalTicket && state.coins < 10) {
       return { success: false, reason: '没有抽卡券，金币也不够（需要10金币）' };
     }
 
-    if (state.tickets > 0) {
+    // 优先使用卡池专属券，再用通用券，最后用金币
+    if (hasTicket) {
+      state[ticketKey]--;
+    } else if (hasUniversalTicket) {
       state.tickets--;
     } else {
       state.coins -= 10;
     }
     GameState.save(state);
 
-    return { success: true, cards: [this.pull()] };
+    return { success: true, cards: [this.pull(poolId)], poolId };
   },
 
   // 十连抽（保底至少1张SR）
-  tenPull() {
+  tenPull(poolId) {
+    const pool = POOL_CONFIG[poolId];
+    if (!pool) return { success: false, reason: '卡池不存在' };
+
     const state = GameState.get();
     const cost = 10;
-    let useTickets = Math.min(state.tickets, cost);
-    let useCoins = (cost - useTickets) * 10;
+    const ticketKey = `ticket_${poolId}`;
+    const poolTickets = state[ticketKey] || 0;
+    const universalTickets = state.tickets || 0;
 
-    if (state.tickets < cost && state.coins < useCoins) {
+    // 计算券的使用
+    let usePoolTickets = Math.min(poolTickets, cost);
+    let remain = cost - usePoolTickets;
+    let useUniversal = Math.min(universalTickets, remain);
+    remain -= useUniversal;
+    let useCoins = remain * 10;
+
+    if (state.coins < useCoins) {
       return { success: false, reason: '抽卡券或金币不足（需要10张券或100金币）' };
     }
 
-    state.tickets -= useTickets;
+    state[ticketKey] = poolTickets - usePoolTickets;
+    state.tickets = universalTickets - useUniversal;
     state.coins -= useCoins;
     GameState.save(state);
 
@@ -93,38 +175,47 @@ const GachaEngine = {
     let hasSR = false;
 
     for (let i = 0; i < 10; i++) {
-      const card = this.pull();
+      const card = this.pull(poolId);
       cards.push(card);
       if (card.rarity === 'SR' || card.rarity === 'SSR') hasSR = true;
     }
 
     // 保底SR
     if (!hasSR) {
-      const srPool = getCardsByRarity('SR');
-      const guaranteed = srPool[Math.floor(Math.random() * srPool.length)];
-      const isDuplicate = state.collection.includes(guaranteed.uid);
+      const srPool = getCardsByRarityInPool('SR', poolId);
+      if (srPool.length > 0) {
+        const guaranteed = srPool[Math.floor(Math.random() * srPool.length)];
+        const isDuplicate = state.collection.includes(guaranteed.uid);
 
-      if (!isDuplicate) {
-        state.collection.push(guaranteed.uid);
-      } else {
-        state.coins += RARITY_CONFIG.SR.coinValue;
+        if (!isDuplicate) {
+          state.collection.push(guaranteed.uid);
+        } else {
+          state.coins += RARITY_CONFIG.SR.coinValue;
+        }
+        GameState.save(state);
+
+        cards[9] = {
+          uid: guaranteed.uid,
+          characterId: guaranteed.characterId,
+          characterName: guaranteed.characterName,
+          description: guaranteed.description,
+          image: guaranteed.src,
+          rarity: 'SR',
+          imageIndex: guaranteed.imageIndex,
+          isDuplicate,
+          coinValue: isDuplicate ? RARITY_CONFIG.SR.coinValue : 0
+        };
       }
-      GameState.save(state);
-
-      cards[9] = {
-        uid: guaranteed.uid,
-        characterId: guaranteed.characterId,
-        characterName: guaranteed.characterName,
-        description: guaranteed.description,
-        image: guaranteed.src,
-        rarity: 'SR',
-        imageIndex: guaranteed.imageIndex,
-        isDuplicate,
-        coinValue: isDuplicate ? RARITY_CONFIG.SR.coinValue : 0
-      };
     }
 
-    return { success: true, cards };
+    return { success: true, cards, poolId };
+  },
+
+  // 获取卡池可用抽卡次数
+  getAvailablePulls(poolId) {
+    const state = GameState.get();
+    const ticketKey = `ticket_${poolId}`;
+    return (state[ticketKey] || 0) + (state.tickets || 0) + Math.floor(state.coins / 10);
   },
 
   // 获取角色收集进度
