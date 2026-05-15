@@ -2846,6 +2846,23 @@ html, body {
 .stat-keeper span { font-family: "JetBrains Mono", monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 1px; }
 .stat-shop .stat-svg { color: var(--resonance); }
 
+/* 快速导航链接 (battle / spec) */
+.stat-link {
+  cursor: pointer; text-decoration: none;
+  gap: 2px; transition: opacity 0.2s;
+}
+.stat-link:hover { opacity: 0.7; }
+.stat-link .stat-svg { color: var(--resonance, #FFD89B); }
+.stat-link .stat-label {
+  font-family: "LXGW WenKai", "Noto Serif SC", serif;
+  font-size: 10px; color: var(--text-dim, #9BA1C7);
+  letter-spacing: 1px;
+}
+.stat-link:hover .stat-label { color: var(--resonance, #FFD89B); }
+@media (max-width: 480px) {
+  .stat-link .stat-label { display: none; }
+}
+
 /* === 卡池页顶部 coser 横滑 tab === */
 .ch-coser-tabs {
   display: flex; gap: 6px;
