@@ -2846,21 +2846,32 @@ html, body {
 .stat-keeper span { font-family: "JetBrains Mono", monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 1px; }
 .stat-shop .stat-svg { color: var(--resonance); }
 
-/* 快速导航链接 (battle / spec) */
+/* 快速导航链接 (battle / spec) — chip 风格 */
 .stat-link {
   cursor: pointer; text-decoration: none;
-  gap: 2px; transition: opacity 0.2s;
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 7px; border-radius: 10px;
+  border: 1px solid rgba(255, 216, 155, 0.4);
+  background: rgba(255, 216, 155, 0.06);
+  transition: all 0.2s; flex-shrink: 0;
 }
-.stat-link:hover { opacity: 0.7; }
-.stat-link .stat-svg { color: var(--resonance, #FFD89B); }
+.stat-link:hover {
+  border-color: var(--resonance, #FFD89B);
+  background: rgba(255, 216, 155, 0.18);
+  box-shadow: 0 0 10px rgba(255, 216, 155, 0.3);
+}
+.stat-link .stat-svg {
+  width: 10px; height: 10px;
+  color: var(--resonance, #FFD89B);
+}
 .stat-link .stat-label {
   font-family: "LXGW WenKai", "Noto Serif SC", serif;
-  font-size: 10px; color: var(--text-dim, #9BA1C7);
-  letter-spacing: 1px;
+  font-size: 10px; color: var(--resonance, #FFD89B);
+  letter-spacing: 0.5px; font-weight: 500;
 }
-.stat-link:hover .stat-label { color: var(--resonance, #FFD89B); }
+/* mobile 下 brand 简化避免被截 */
 @media (max-width: 480px) {
-  .stat-link .stat-label { display: none; }
+  .brand .brand-sep, .brand .brand-net { display: none; }
 }
 
 /* === 卡池页顶部 coser 横滑 tab === */
