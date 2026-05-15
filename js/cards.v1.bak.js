@@ -317,7 +317,8 @@ const CHARACTERS = [
       { src: 'img/卡提希娅/DSC_8529.jpg', rarity: 'R' },
       { src: 'img/卡提希娅/DSC_8532.jpg', rarity: 'R' },
       { src: 'img/卡提希娅/DSC_8543.jpg', rarity: 'R' }
-    ]
+    ],
+    pool: 'limited'
   },
   {
     id: 'bunny-02',
@@ -540,9 +541,10 @@ const CHARACTERS = [
 
 // 稀有度配置（甜美少女风配色）
 const RARITY_CONFIG = {
-  SSR: { color: '#FFD700', glow: 'rgba(255,215,0,0.5)', label: 'SSR', prob: 3, coinValue: 50, gradient: 'linear-gradient(135deg, #FFD700, #FFA500)' },
-  SR:  { color: '#E8A0BF', glow: 'rgba(232,160,191,0.5)', label: 'SR',  prob: 15, coinValue: 20, gradient: 'linear-gradient(135deg, #E8A0BF, #C066FF)' },
-  R:   { color: '#89CFF0', glow: 'rgba(137,207,240,0.4)', label: 'R',   prob: 82, coinValue: 5, gradient: 'linear-gradient(135deg, #89CFF0, #A0D2DB)' }
+  // SSR 重复不再给 Beacon，改给 50 共鸣碎片 + 阶段解锁
+  SSR: { color: '#FFD700', glow: 'rgba(255,215,0,0.5)', label: 'SSR', prob: 3, coinValue: 0,  shardValue: 50, gradient: 'linear-gradient(135deg, #FFD700, #FFA500)' },
+  SR:  { color: '#E8A0BF', glow: 'rgba(232,160,191,0.5)', label: 'SR',  prob: 15, coinValue: 20, shardValue: 0,  gradient: 'linear-gradient(135deg, #E8A0BF, #C066FF)' },
+  R:   { color: '#89CFF0', glow: 'rgba(137,207,240,0.4)', label: 'R',   prob: 82, coinValue: 5,  shardValue: 0,  gradient: 'linear-gradient(135deg, #89CFF0, #A0D2DB)' }
 };
 
 // 获取所有卡牌（扁平化，每张图片是一个独立卡牌）
@@ -624,9 +626,9 @@ const POOL_CONFIG = {
     description: '包含所有常驻角色，经典永不落幕',
     type: 'permanent',
     cost: 1,
-    pityLimit: 90,
-    softPityStart: 60,
-    softPityRate: 6,
+    pityLimit: 60,
+    softPityStart: 30,
+    softPityRate: 8,
     rateUpCharId: null,
     rateUpFraction: 0,
     bgImage: null
@@ -638,9 +640,9 @@ const POOL_CONFIG = {
     description: '限定角色卡提希娅概率UP！错过不再有',
     type: 'limited',
     cost: 1,
-    pityLimit: 80,
-    softPityStart: 50,
-    softPityRate: 7,
+    pityLimit: 50,
+    softPityStart: 30,
+    softPityRate: 8,
     rateUpCharId: 'katixiya',
     rateUpFraction: 0.5,
     bgImage: 'img/卡提希娅/DSC_8497.jpg',
@@ -654,12 +656,75 @@ const POOL_CONFIG = {
     description: '兔女郎系列专属卡池，每期轮换UP角色',
     type: 'permanent',
     cost: 1,
-    pityLimit: 90,
-    softPityStart: 60,
-    softPityRate: 6,
+    pityLimit: 60,
+    softPityStart: 30,
+    softPityRate: 8,
     rateUpCharId: 'bunny-mai',
     rateUpFraction: 2/3,
     bgImage: null,
     rotationOrder: ['bunny-mai', 'bunny-ahri', 'bunny-shinobu', 'bunny-scathach', 'bunny-kato', 'bunny-miku', 'bunny-02', 'bunny-atago', 'bunny-lancer']
   }
 };
+
+// Coser 档案（妍子作为 coser 整体的信息 — 用于图鉴详情页顶部）
+const COSER_PROFILE = {
+  id: 'yanzi',
+  name: '妍子',
+  location: '北京',
+  tags: ['森林系', '古典童话', '高质量写真'],
+  intro: '北京 · 多套 cos 写真已发布，擅长古典、童话、二次元角色。每套写真精修约 14 张，守护后可下载原图。',
+  // 妍子在频率战的出战档案（coser 整体绑定一个 archetype）
+  battle: {
+    letter: 'A',
+    archetype: 'STRIKE',
+    nameCN: '焰',
+    color: '#FF8A5C',
+    desc: '触达基础伤害 3 · 连击 3/4/5 · 主动出击型',
+    stats: { atk: 3, combo: 2, reflect: 1 },
+    ult: {
+      cn: '烈触达', en: 'BLAZE TOUCH',
+      trigger: '连击 ≥ 3',
+      effect: '下次触达 · 伤害 +2 · 穿透守护',
+      tagline: '焰息共鸣 · 一击破阵'
+    }
+  }
+};
+
+// 旧的每角色 archetype 表（不再用于图鉴详情，保留用于未来扩展）
+// archetype: A · STRIKE(主动出击) / B · REFLECT(反击) / C · OVERFLOW(蓄能爆发)
+const BATTLE_PROFILES = {
+  // A · STRIKE 主动出击型
+  '2b':            { letter: 'A', archetype: 'STRIKE',   nameCN: '焰',    color: '#FF8A5C', desc: '触达基础 3 · 连击 3/4/5 · 主动出击型', stats: { atk: 3, combo: 2, reflect: 1 }, ult: { cn: '烈触达', en: 'BLAZE TOUCH',     trigger: '连击 ≥ 3', effect: '下次触达 · 伤害 +2 · 穿透守护' } },
+  'raiden-shogun': { letter: 'A', archetype: 'STRIKE',   nameCN: '雷',    color: '#FF8A5C', desc: '触达基础 3 · 雷之连击 · 麻痹敌方蓄能',  stats: { atk: 3, combo: 2, reflect: 1 }, ult: { cn: '心眼一刀', en: 'STARSEEKER',   trigger: '连击 ≥ 3', effect: '触达 +2 · 标记敌方蓄能为废' } },
+  'tifa':          { letter: 'A', archetype: 'STRIKE',   nameCN: '拳',    color: '#FF8A5C', desc: '触达基础 3 · 柔拳无影 · 连击爆裂',     stats: { atk: 3, combo: 2, reflect: 1 }, ult: { cn: '终极豪拳', en: 'FINAL HEAVEN', trigger: '连击 ≥ 3', effect: '连击伤害 +3 · 穿透守护' } },
+  'asuka':         { letter: 'A', archetype: 'STRIKE',   nameCN: '骄',    color: '#FF8A5C', desc: '触达基础 3 · 骄傲无前 · 不愿落败',     stats: { atk: 3, combo: 2, reflect: 1 }, ult: { cn: '至高之矛', en: 'SPEAR LANCE',  trigger: '连击 ≥ 3', effect: '触达 +3 · 穿透守护' } },
+  'bunny-scathach':{ letter: 'A', archetype: 'STRIKE',   nameCN: '影',    color: '#FF8A5C', desc: '触达基础 3 · 影之刺杀 · 暗夜女王',     stats: { atk: 3, combo: 2, reflect: 1 }, ult: { cn: '影刺连环', en: 'SHADOW SPEAR', trigger: '连击 ≥ 3', effect: '连击伤害 ×1.5 · 穿透' } },
+  'bunny-ahri':    { letter: 'A', archetype: 'STRIKE',   nameCN: '魅',    color: '#FF8A5C', desc: '触达基础 3 · 魅惑迷踪 · 九尾穿心',     stats: { atk: 3, combo: 2, reflect: 1 }, ult: { cn: '魅惑迷踪', en: 'CHARM TRACE',  trigger: '连击 ≥ 3', effect: '触达 +2 · 反弹蓄能' } },
+
+  // B · REFLECT 反击型
+  'albedo':        { letter: 'B', archetype: 'REFLECT',  nameCN: '阿尔贝', color: '#C4A0FF', desc: '反伤 +1 · 被击 2 次自动 +1 能量 · 反击型',  stats: { atk: 2, combo: 2, reflect: 2 }, ult: { cn: '共鸣回响', en: 'RESONANCE ECHO', trigger: 'HP ≤ 6',   effect: '两回合内 · 反伤回血 ×150% +2' } },
+  'rei':           { letter: 'B', archetype: 'REFLECT',  nameCN: '寂',    color: '#C4A0FF', desc: '反伤 +1 · 冰封静默 · 反震如刺',         stats: { atk: 2, combo: 2, reflect: 2 }, ult: { cn: '静默反震', en: 'SILENT ECHO',  trigger: 'HP ≤ 6',   effect: '反伤伤害 ×150% · 持续两回合' } },
+  'haimeng':       { letter: 'B', archetype: 'REFLECT',  nameCN: '巡',    color: '#C4A0FF', desc: '反伤 +1 · 秩序守护 · 反击如风',         stats: { atk: 2, combo: 2, reflect: 2 }, ult: { cn: '执法回响', en: 'JUSTICE ECHO', trigger: 'HP ≤ 6',   effect: '凝固反震伤害翻倍 · 持续两回合' } },
+  'kato':          { letter: 'B', archetype: 'REFLECT',  nameCN: '默',    color: '#C4A0FF', desc: '反伤 +1 · 邻家温柔 · 守护型',           stats: { atk: 2, combo: 2, reflect: 2 }, ult: { cn: '温柔回响', en: 'GENTLE ECHO',  trigger: 'HP ≤ 6',   effect: '反伤回血 +3 · 治愈伙伴' } },
+  'bunny-kato':    { letter: 'B', archetype: 'REFLECT',  nameCN: '柔',    color: '#C4A0FF', desc: '反伤 +1 · 温柔反震 · 慢热反击',         stats: { atk: 2, combo: 2, reflect: 2 }, ult: { cn: '回光反震', en: 'WARM ECHO',   trigger: 'HP ≤ 6',   effect: '反伤 ×2 · 持续两回合' } },
+  'qipao':         { letter: 'B', archetype: 'REFLECT',  nameCN: '韵',    color: '#C4A0FF', desc: '反伤 +1 · 古韵端庄 · 以柔克刚',         stats: { atk: 2, combo: 2, reflect: 2 }, ult: { cn: '柔水回响', en: 'JADE ECHO',   trigger: 'HP ≤ 6',   effect: '凝固反震 +2 · 卸力' } },
+
+  // C · OVERFLOW 蓄能爆发型
+  'garden-snow':   { letter: 'C', archetype: 'OVERFLOW', nameCN: '雪',    color: '#7BC9FF', desc: '聚频 2/4/7/11 · 极光不熄 · 频率永续',   stats: { atk: 2, combo: 2, reflect: 1, charge: 1 }, ult: { cn: '共鸣溢出', en: 'OVERFLOW',     trigger: '蓄能 ≥ 8', effect: '下次爆响 · 穿透守护 · 蓄能不消耗' } },
+  'katixiya':      { letter: 'C', archetype: 'OVERFLOW', nameCN: '光',    color: '#FFD89B', desc: '聚频 2/4/7/11 · 限定共鸣 · 极光降临',   stats: { atk: 2, combo: 2, reflect: 1, charge: 2 }, ult: { cn: '极光绽放', en: 'AURORA BLOOM', trigger: '蓄能 ≥ 8', effect: '爆响伤害 ×2 · 穿透守护' } },
+  'hutao':         { letter: 'C', archetype: 'OVERFLOW', nameCN: '蝶',    color: '#7BC9FF', desc: '聚频 2/4/7/11 · 蝶舞往生 · 蓄势待发',   stats: { atk: 2, combo: 2, reflect: 1, charge: 1 }, ult: { cn: '安神化蝶', en: 'BUTTERFLY SOUL', trigger: '蓄能 ≥ 8', effect: '爆响 +3 · 标记敌方两回合' } },
+  '02-wedding':    { letter: 'C', archetype: 'OVERFLOW', nameCN: '誓',    color: '#7BC9FF', desc: '聚频 2/4/7/11 · 心之誓约 · 爆发型',     stats: { atk: 2, combo: 2, reflect: 1, charge: 1 }, ult: { cn: '心之誓约', en: 'OATH BURST',   trigger: '蓄能 ≥ 8', effect: '爆响 +2 · 自身回血 2' } },
+  'guitar':        { letter: 'C', archetype: 'OVERFLOW', nameCN: '律',    color: '#7BC9FF', desc: '聚频 2/4/7/11 · 共鸣节拍 · 旋律爆发',   stats: { atk: 2, combo: 2, reflect: 1, charge: 1 }, ult: { cn: '共鸣节拍', en: 'RHYTHM BURST', trigger: '蓄能 ≥ 8', effect: '爆响 +2 · 下回合 +1 能量' } },
+  'zombie':        { letter: 'C', archetype: 'OVERFLOW', nameCN: '腐',    color: '#7BC9FF', desc: '聚频 2/4/7/11 · 腐韵蓄势 · 不死爆发',   stats: { atk: 2, combo: 2, reflect: 1, charge: 1 }, ult: { cn: '腐律之爆', en: 'DECAY BURST',  trigger: '蓄能 ≥ 8', effect: '爆响 +2 · 自身 HP ≤ 3 时 +5' } },
+  'bunny':         { letter: 'C', archetype: 'OVERFLOW', nameCN: '兔',    color: '#7BC9FF', desc: '聚频 2/4/7/11 · 兔灵共鸣 · 蓄能爆发',   stats: { atk: 2, combo: 2, reflect: 1, charge: 1 }, ult: { cn: '兔灵之跃', en: 'LUNAR LEAP',   trigger: '蓄能 ≥ 8', effect: '爆响 +3 · 触发额外触达' } },
+  'bunny-mai':     { letter: 'C', archetype: 'OVERFLOW', nameCN: '麻衣',  color: '#FFD89B', desc: '聚频 2/4/7/11 · 夜之女王 · 共鸣加冕',   stats: { atk: 2, combo: 2, reflect: 1, charge: 1 }, ult: { cn: '焦点闪烁', en: 'STAGE LIGHT',  trigger: '蓄能 ≥ 8', effect: '爆响吸引仇恨 · 反伤 +2' } },
+  'bunny-02':      { letter: 'C', archetype: 'OVERFLOW', nameCN: '炽',    color: '#7BC9FF', desc: '聚频 2/4/7/11 · 炽爱蓄势 · 一击燃尽',   stats: { atk: 2, combo: 2, reflect: 1, charge: 1 }, ult: { cn: '炽爱燃尽', en: 'BURN OUT',     trigger: '蓄能 ≥ 8', effect: '爆响 +4 · 自身 -2 HP' } },
+  'bunny-miku':    { letter: 'C', archetype: 'OVERFLOW', nameCN: '音',    color: '#7BC9FF', desc: '聚频 2/4/7/11 · 音波共鸣 · 节拍爆发',   stats: { atk: 2, combo: 2, reflect: 1, charge: 1 }, ult: { cn: '声之爆响', en: 'VOICE BURST',  trigger: '蓄能 ≥ 8', effect: '爆响 +2 · 蓄能不消耗' } },
+  'bunny-atago':   { letter: 'C', archetype: 'OVERFLOW', nameCN: '汐',    color: '#7BC9FF', desc: '聚频 2/4/7/11 · 潮汐蓄势 · 海之爆发',   stats: { atk: 2, combo: 2, reflect: 1, charge: 1 }, ult: { cn: '潮汐之击', en: 'TIDAL CRASH',  trigger: '蓄能 ≥ 8', effect: '爆响 +3 · 减敌方 2 反伤' } },
+  'bunny-shinobu': { letter: 'C', archetype: 'OVERFLOW', nameCN: '蝶',    color: '#7BC9FF', desc: '聚频 2/4/7/11 · 蝶之毒舞 · 优雅爆发',   stats: { atk: 2, combo: 2, reflect: 1, charge: 1 }, ult: { cn: '蝶毒之华', en: 'POISON BLOOM', trigger: '蓄能 ≥ 8', effect: '爆响 +2 · 敌方下回合 -1 atk' } },
+  'bunny-lancer':  { letter: 'C', archetype: 'OVERFLOW', nameCN: '枪',    color: '#7BC9FF', desc: '聚频 2/4/7/11 · 苍翠之矛 · 蓄能突袭',   stats: { atk: 2, combo: 2, reflect: 1, charge: 1 }, ult: { cn: '苍翠之矛', en: 'AZURE LANCE',  trigger: '蓄能 ≥ 8', effect: '爆响 +3 · 穿透守护' } },
+};
+
+function getBattleProfile(charId) {
+  return BATTLE_PROFILES[charId] || null;
+}

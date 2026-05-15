@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Memoria · 视觉效果 Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Outfit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0F25;
+  --bg-deep: #060A1A;
+  --bg-card: rgba(20, 27, 56, 0.65);
+  --bg-card-2: rgba(30, 39, 80, 0.5);
+  --line: rgba(155, 161, 199, 0.18);
+  --line-strong: rgba(155, 161, 199, 0.4);
+  --text: #E8EAF6;
+  --text-dim: #9BA1C7;
+  --text-faint: #5C6390;
+  --signal: #7BC9FF;
+  --echo: #C4A0FF;
+  --resonance: #FFD89B;
+  --aurora-pink: #FFB8D9;
+  --danger: #FF6B8A;
+  --hp: #FF6B8A;
+  --energy: #7BC9FF;
+  --charge: #FFD89B;
+  --attack: #FF8A5C;
+  --power: #FFD24A;
+  --block: #7BC9FF;
+  --guard: #C4A0FF;
+  --chargec: #6BE3A0;
+  --breakc: #B580FF;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  background: #050816;
+  color: var(--text);
+  font-family: "Outfit", -apple-system, sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+  overflow: hidden;
+  user-select: none;
+}
+#root {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.phone-shell {
+  width: 100%;
+  max-width: 420px;
+  height: 100vh;
+  max-height: 900px;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(123,201,255,0.2),
+    0 0 80px rgba(123,201,255,0.3);
+}
+@media (min-width: 500px) {
+  .phone-shell {
+    border-radius: 36px;
+    border: 4px solid #1a2240;
+    max-height: 880px;
+  }
+}
+
+/* ===== 极光背景 + 频率波线（替代死板背景） ===== */
+.aurora {
+  position: absolute; inset: 0;
+  overflow: hidden; pointer-events: none;
+  z-index: 0;
+}
+.aurora::before, .aurora::after {
+  content: '';
+  position: absolute;
+  width: 200%; height: 200%;
+  filter: blur(60px);
+  opacity: 0.4;
+  mix-blend-mode: screen;
+  animation: floatAurora 14s ease-in-out infinite;
+}
+.aurora::before {
+  background: radial-gradient(ellipse at 30% 30%, var(--signal), transparent 50%);
+  top: -50%; left: -50%;
+}
+.aurora::after {
+  background: radial-gradient(ellipse at 70% 70%, var(--echo), transparent 50%);
+  bottom: -50%; right: -50%;
+  animation-delay: -7s;
+}
+@keyframes floatAurora {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(10%, 8%) scale(1.15); }
+}
+
+/* 频率波线（示波器感） */
+.scan-lines {
+  position: absolute; inset: 0;
+  z-index: 0; pointer-events: none;
+  opacity: 0.4;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 3px,
+    rgba(123,201,255,0.04) 3px,
+    rgba(123,201,255,0.04) 4px
+  );
+}
+
+/* 粒子流（光点从下升起） */
+.particles {
+  position: absolute; inset: 0;
+  z-index: 0; pointer-events: none;
+}
+.particle {
+  position: absolute;
+  bottom: -10px;
+  width: 2px; height: 2px;
+  background: var(--signal);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--signal);
+  animation: floatUp 8s linear infinite;
+  opacity: 0;
+}
+@keyframes floatUp {
+  0% { opacity: 0; transform: translateY(0) translateX(0); }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-100vh) translateX(20px); }
+}
+
+/* HP 危急时屏幕红色脉动 */
+.danger-vignette {
+  position: absolute; inset: 0;
+  z-index: 5; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(255,107,138,0.5) 100%);
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.danger-vignette.active {
+  opacity: 1;
+  animation: dangerPulse 0.9s ease-in-out infinite;
+}
+@keyframes dangerPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.9; }
+}
+
+/* ===== 顶部 ===== */
+.topbar {
+  padding: 14px 18px 8px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+  position: relative; z-index: 2;
+}
+.brand {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--signal), var(--aurora-pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--text-faint);
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+
+/* ===== 角色卡（呼吸 + 频率包裹） ===== */
+.arena {
+  flex: 1;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  padding: 10px;
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+}
+.fighter {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  padding: 6px 0;
+}
+.fighter-meta {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-align: center;
+  margin-bottom: 6px;
+}
+.fighter.enemy .fighter-meta { color: var(--danger); }
+.fighter.player .fighter-meta { color: var(--signal); }
+
+.fighter-card-wrap {
+  position: relative;
+  width: 132px;
+  margin: 0 auto;
+}
+.fighter-card {
+  width: 132px;
+  aspect-ratio: 3/4;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--bg-card), var(--bg-card-2));
+  border: 2px solid var(--line);
+  animation: breathe 3s ease-in-out infinite;
+}
+.fighter.enemy .fighter-card {
+  border-color: var(--danger);
+  box-shadow: 0 0 28px rgba(255,107,138,0.3);
+  background: radial-gradient(ellipse at 50% 30%, rgba(255,107,138,0.35), rgba(10,15,37,0.95));
+}
+.fighter.player .fighter-card {
+  border-color: var(--signal);
+  box-shadow: 0 0 28px rgba(123,201,255,0.3);
+  background: radial-gradient(ellipse at 50% 30%, rgba(123,201,255,0.35), rgba(10,15,37,0.95));
+}
+@keyframes breathe {
+  0%, 100% { transform: scale(0.98); }
+  50% { transform: scale(1.02); }
+}
+.fighter-card.hit { animation: hitShake 0.5s; }
+.fighter-card.charging-bright {
+  box-shadow: 0 0 32px rgba(255,216,155,0.6), 0 0 64px rgba(255,216,155,0.3) !important;
+}
+@keyframes hitShake {
+  0%, 100% { transform: translateX(0) scale(0.98); }
+  20% { transform: translateX(-8px) scale(0.95); }
+  40% { transform: translateX(8px) scale(0.95); }
+  60% { transform: translateX(-4px) scale(0.95); }
+  80% { transform: translateX(4px) scale(0.95); }
+}
+.fighter-letter {
+  position: absolute;
+  inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 80px;
+  font-style: italic;
+  font-weight: 500;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.6);
+}
+.fighter.enemy .fighter-letter { color: var(--danger); }
+.fighter.player .fighter-letter { color: var(--signal); }
+
+/* === 能量环（角色卡周围 3 段） === */
+.energy-ring {
+  position: absolute;
+  inset: -14px;
+  pointer-events: none;
+}
+.energy-ring svg {
+  width: 100%; height: 100%;
+  transform: rotate(-90deg);
+}
+.energy-arc {
+  fill: none;
+  stroke-width: 2.5;
+  opacity: 0.25;
+  transition: opacity 0.4s, stroke 0.4s;
+}
+.energy-arc.active {
+  opacity: 1;
+  filter: drop-shadow(0 0 6px currentColor);
+}
+.fighter.enemy .energy-arc { stroke: var(--danger); }
+.fighter.player .energy-arc { stroke: var(--energy); }
+
+/* === 蓄能光柱（卡下方/上方） === */
+.charge-pillar {
+  position: absolute;
+  left: 50%;
+  width: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to top, var(--charge), rgba(255,216,155,0.3));
+  box-shadow: 0 0 10px var(--charge), 0 0 24px rgba(255,216,155,0.4);
+  transition: height 0.5s ease-out, width 0.5s;
+  transform: translateX(-50%);
+}
+.fighter.player .charge-pillar {
+  bottom: -10px;
+  background: linear-gradient(to top, var(--charge), rgba(255,216,155,0.3));
+}
+.fighter.enemy .charge-pillar {
+  top: -10px;
+  background: linear-gradient(to bottom, var(--charge), rgba(255,216,155,0.3));
+}
+.charge-pillar.peak {
+  width: 10px;
+  box-shadow: 0 0 16px var(--charge), 0 0 40px var(--charge);
+  animation: chargePeak 1.2s ease-in-out infinite;
+}
+@keyframes chargePeak {
+  0%, 100% { box-shadow: 0 0 16px var(--charge), 0 0 40px var(--charge); }
+  50% { box-shadow: 0 0 24px var(--charge), 0 0 60px var(--power); }
+}
+
+/* === 心跳波形 === */
+.heartbeat {
+  width: 100%;
+  height: 32px;
+  margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+}
+.heartbeat svg {
+  width: 200%; height: 100%;
+  animation: heartScroll 2.5s linear infinite;
+}
+.fighter.enemy .heartbeat polyline { stroke: var(--danger); }
+.fighter.player .heartbeat polyline { stroke: var(--signal); }
+.heartbeat polyline {
+  fill: none;
+  stroke-width: 1.4;
+  filter: drop-shadow(0 0 4px currentColor);
+}
+.heartbeat.urgent svg { animation-duration: 0.8s; }
+.heartbeat.urgent polyline { stroke-width: 1.8; }
+@keyframes heartScroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.heartbeat-label {
+  position: absolute;
+  left: 0; top: 50%; transform: translateY(-50%);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--text-faint);
+  background: rgba(5,8,22,0.7);
+  padding: 1px 5px;
+  z-index: 2;
+}
+.heartbeat-val {
+  position: absolute;
+  right: 0; top: 50%; transform: translateY(-50%);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(5,8,22,0.7);
+  padding: 1px 6px;
+  z-index: 2;
+}
+.fighter.enemy .heartbeat-val { color: var(--danger); }
+.fighter.player .heartbeat-val { color: var(--signal); }
+
+/* === 中央回合数 + 战况 === */
+.battle-center {
+  text-align: center;
+  margin: 8px 0;
+  min-height: 24px;
+  position: relative;
+  z-index: 2;
+}
+.round-num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--text-faint);
+}
+.battle-msg {
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--resonance);
+  letter-spacing: 0.5px;
+  margin-top: 3px;
+  animation: msgIn 0.4s ease-out;
+}
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === 出招动作符号（中线碰撞） === */
+.clash-zone {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 6;
+  pointer-events: none;
+}
+.action-icon {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 96px; height: 96px;
+  opacity: 0;
+  filter: drop-shadow(0 0 16px currentColor) drop-shadow(0 0 32px currentColor);
+}
+.action-icon svg { display: block; width: 100%; height: 100%; }
+.action-icon.from-top {
+  animation: shootDown 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.action-icon.from-bottom {
+  animation: shootUp 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes shootDown {
+  0%   { opacity: 0; transform: translate(-50%, -300%) scale(0.5); }
+  50%  { opacity: 1; transform: translate(-50%, -80%) scale(1); }
+  85%  { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(2); }
+}
+@keyframes shootUp {
+  0%   { opacity: 0; transform: translate(-50%, 200%) scale(0.5); }
+  50%  { opacity: 1; transform: translate(-50%, -20%) scale(1); }
+  85%  { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(2); }
+}
+
+/* 撞击爆发 */
+.clash-burst {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.85), rgba(255,216,155,0.4) 30%, transparent 70%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 7;
+}
+.clash-burst.fire {
+  animation: burstFlash 0.5s ease-out;
+}
+@keyframes burstFlash {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+  40% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(2.2); }
+}
+
+/* ===== 底部 6 个动作 ===== */
+.battle-actions {
+  flex-shrink: 0;
+  padding: 12px 14px 16px;
+  background: rgba(6,10,26,0.7);
+  border-top: 1px solid var(--line);
+  backdrop-filter: blur(8px);
+  position: relative;
+  z-index: 3;
+}
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.act-btn {
+  padding: 10px 4px 8px;
+  border-radius: 12px;
+  border: 1.5px solid;
+  background: rgba(20,27,56,0.6);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.18s;
+  position: relative;
+  overflow: hidden;
+}
+.act-btn:active { transform: scale(0.94); }
+.act-btn.attack { border-color: var(--attack); color: var(--attack); }
+.act-btn.power { border-color: var(--power); color: var(--power); }
+.act-btn.block { border-color: var(--block); color: var(--block); }
+.act-btn.guard { border-color: var(--guard); color: var(--guard); }
+.act-btn.charge { border-color: var(--chargec); color: var(--chargec); }
+.act-btn.break { border-color: var(--breakc); color: var(--breakc); }
+.act-btn:hover { background: rgba(255,255,255,0.05); }
+.act-btn .ab-symbol {
+  width: 32px; height: 32px;
+  margin: 0 auto 3px;
+  filter: drop-shadow(0 0 6px currentColor);
+}
+.act-btn .ab-symbol svg { display: block; width: 100%; height: 100%; }
+.act-btn .ab-name {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  opacity: 0.85;
+}
+
+.hint {
+  text-align: center;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--text-faint);
+  margin-top: 8px;
+}
+
+/* ===== 特写全屏镜头 ===== */
+.special-overlay {
+  position: absolute; inset: 0;
+  z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
+}
+.special-overlay.burst {
+  background: radial-gradient(circle, rgba(255,210,74,0.45), rgba(0,0,0,0.85) 70%);
+  animation: burstOverlay 1.4s ease-out forwards;
+}
+@keyframes burstOverlay {
+  0%   { opacity: 0; backdrop-filter: blur(0); }
+  20%  { opacity: 1; backdrop-filter: blur(2px); }
+  85%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+.special-overlay.win {
+  background: radial-gradient(circle, rgba(255,184,217,0.6), rgba(123,201,255,0.4) 50%, rgba(0,0,0,0.85) 80%);
+  animation: burstOverlay 2.6s ease-out forwards;
+}
+.special-text {
+  text-align: center;
+  animation: textBoom 1.2s ease-out;
+}
+.special-text .main {
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  font-size: 76px;
+  font-weight: 600;
+  letter-spacing: 10px;
+  line-height: 1;
+  text-shadow: 0 0 40px currentColor;
+}
+.special-text .sub {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  letter-spacing: 8px;
+  margin-top: 14px;
+  color: rgba(255,255,255,0.7);
+}
+.special-overlay.burst .special-text .main { color: var(--power); }
+.special-overlay.win .special-text .main {
+  background: linear-gradient(135deg, var(--resonance), var(--aurora-pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 56px;
+}
+@keyframes textBoom {
+  0%   { opacity: 0; transform: scale(0.3); }
+  50%  { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* 破蓄斩切特效 */
+.break-slash {
+  position: absolute; inset: 0;
+  z-index: 90; pointer-events: none;
+  opacity: 0;
+}
+.break-slash.fire {
+  animation: slashAnim 0.7s ease-out;
+}
+.break-slash::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: -10%;
+  width: 120%; height: 4px;
+  background: linear-gradient(90deg, transparent, var(--breakc), white, var(--breakc), transparent);
+  transform: translateY(-50%) rotate(-15deg);
+  filter: blur(1px);
+  box-shadow: 0 0 30px var(--breakc), 0 0 60px var(--breakc);
+}
+@keyframes slashAnim {
+  0%   { opacity: 0; transform: translateX(-100%); }
+  30%  { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(50%); }
+}
+
+/* === 顶部 demo 控制条 === */
+.fx-controls {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  background: rgba(5,8,22,0.85);
+  backdrop-filter: blur(20px);
+  padding: 8px 12px;
+  display: flex; gap: 6px;
+  flex-wrap: wrap;
+  z-index: 30;
+  border-bottom: 1px solid var(--line);
+}
+.fx-btn {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  padding: 4px 8px;
+  background: rgba(20,27,56,0.6);
+  border: 1px solid var(--line);
+  color: var(--text-dim);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.fx-btn:hover { border-color: var(--signal); color: var(--signal); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.23.0/babel.min.js"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const ACTIONS = [
+  { id: 'attack', name: '触达', latin: 'TOUCH',  cls: 'attack' },
+  { id: 'power',  name: '爆响', latin: 'BURST',  cls: 'power' },
+  { id: 'block',  name: '守护', latin: 'HOLD',   cls: 'block' },
+  { id: 'guard',  name: '凝固', latin: 'STILL',  cls: 'guard' },
+  { id: 'charge', name: '聚频', latin: 'TUNE',   cls: 'charge' },
+  { id: 'break',  name: '散频', latin: 'BREAK',  cls: 'break' },
+];
+
+function ActionGlyph({ action, size = 32 }) {
+  const p = {
+    width: size, height: size,
+    viewBox: "0 0 100 100",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 4,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+  };
+  switch(action) {
+    case 'attack': return (
+      <svg {...p}>
+        <path d="M 18 50 L 72 50"/>
+        <path d="M 56 32 L 84 50 L 56 68"/>
+      </svg>
+    );
+    case 'power': return (
+      <svg {...p}>
+        <circle cx="50" cy="50" r="9" fill="currentColor" stroke="none"/>
+        <line x1="50" y1="12" x2="50" y2="28"/>
+        <line x1="50" y1="72" x2="50" y2="88"/>
+        <line x1="12" y1="50" x2="28" y2="50"/>
+        <line x1="72" y1="50" x2="88" y2="50"/>
+        <line x1="24" y1="24" x2="34" y2="34"/>
+        <line x1="66" y1="66" x2="76" y2="76"/>
+        <line x1="76" y1="24" x2="66" y2="34"/>
+        <line x1="34" y1="66" x2="24" y2="76"/>
+      </svg>
+    );
+    case 'block': return (
+      <svg {...p}>
+        <circle cx="50" cy="50" r="34"/>
+        <circle cx="50" cy="50" r="18" strokeWidth="2.5"/>
+      </svg>
+    );
+    case 'guard': return (
+      <svg {...p}>
+        <polygon points="50,12 84,30 84,70 50,88 16,70 16,30"/>
+        <polygon points="50,32 66,42 66,58 50,68 34,58 34,42" strokeWidth="2.5"/>
+      </svg>
+    );
+    case 'charge': return (
+      <svg {...p}>
+        <path d="M 18 78 Q 32 78, 38 60 T 56 38 T 80 18"/>
+        <path d="M 70 18 L 84 18 L 84 32"/>
+      </svg>
+    );
+    case 'break': return (
+      <svg {...p}>
+        <line x1="22" y1="22" x2="78" y2="78"/>
+        <line x1="78" y1="22" x2="22" y2="78"/>
+        <circle cx="50" cy="50" r="5" fill="currentColor" stroke="none"/>
+      </svg>
+    );
+    default: return null;
+  }
+}
+
+// 心跳波形 polyline 点（一个波 + 平直线 + 一个波循环）
+const heartbeatPath = "0,16 30,16 35,8 40,24 45,12 50,16 100,16 130,16 135,8 140,24 145,12 150,16 200,16";
+
+function HeartbeatLine({ urgent, label, val, max }) {
+  return (
+    <div className={`heartbeat ${urgent ? 'urgent' : ''}`}>
+      <span className="heartbeat-label">{label}</span>
+      <span className="heartbeat-val">{val}/{max}</span>
+      <svg viewBox="0 0 200 32" preserveAspectRatio="none">
+        <polyline points={heartbeatPath} />
+      </svg>
+    </div>
+  );
+}
+
+function EnergyRing({ value, max, side }) {
+  // 围绕角色卡画 max 段圆弧，每段对应 1 能量
+  const r = 50;
+  const segments = [];
+  const segGap = 4;
+  const total = 2 * Math.PI * r;
+  const segLen = (total / max) - segGap;
+  for (let i = 0; i < max; i++) {
+    const offset = -i * (segLen + segGap);
+    segments.push(
+      <circle key={i}
+        cx="50%" cy="50%" r={r}
+        className={`energy-arc ${i < value ? 'active' : ''}`}
+        strokeDasharray={`${segLen} ${total - segLen}`}
+        strokeDashoffset={offset}
+        pathLength={total}
+      />
+    );
+  }
+  return (
+    <div className="energy-ring">
+      <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+        {segments}
+      </svg>
+    </div>
+  );
+}
+
+function ChargePillar({ value, max, peak }) {
+  const h = Math.max(0, (value / max) * 80);  // 0-80px 高
+  return (
+    <div className={`charge-pillar ${peak ? 'peak' : ''}`}
+         style={{ height: `${h}px` }} />
+  );
+}
+
+function Fighter({ side, letter, name, hp, hpMax, energy, energyMax, charge, chargeMax, hit, chargingBright }) {
+  const urgent = hp / hpMax < 0.33;
+  return (
+    <div className={`fighter ${side}`}>
+      <div className="fighter-meta">
+        {side === 'enemy' ? `STATIC · ${name}` : `YOU · ${name}`}
+      </div>
+      <div className="fighter-card-wrap">
+        <EnergyRing value={energy} max={energyMax} side={side} />
+        <div className={`fighter-card ${hit ? 'hit' : ''} ${chargingBright ? 'charging-bright' : ''}`}>
+          <div className="fighter-letter">{letter}</div>
+        </div>
+        <ChargePillar value={charge} max={chargeMax} peak={charge >= chargeMax * 0.7} />
+      </div>
+      <HeartbeatLine urgent={urgent} label="BEAT" val={hp} max={hpMax} />
+    </div>
+  );
+}
+
+function App() {
+  const MAX_HP = 15;
+  const MAX_ENERGY = 3;
+  const MAX_CHARGE = 10;
+
+  const [pHp, setPHp] = useState(12);
+  const [eHp, setEHp] = useState(11);
+  const [pEnergy, setPEnergy] = useState(2);
+  const [eEnergy, setEEnergy] = useState(2);
+  const [pCharge, setPCharge] = useState(3);
+  const [eCharge, setECharge] = useState(5);
+
+  const [pAction, setPAction] = useState(null);
+  const [eAction, setEAction] = useState(null);
+  const [phase, setPhase] = useState('idle');  // 'idle' | 'engage' | 'clash' | 'msg'
+  const [msg, setMsg] = useState('选你的频率 · 同时回响');
+  const [round, setRound] = useState(3);
+
+  const [hit, setHit] = useState({ player: false, enemy: false });
+  const [special, setSpecial] = useState(null);
+  const [slash, setSlash] = useState(false);
+  const [lowHpActive, setLowHpActive] = useState(false);
+
+  function pickAction(actId) {
+    if (phase !== 'idle') return;
+    const eActId = ['attack', 'block', 'guard', 'charge'][Math.floor(Math.random() * 4)];
+    setPAction(actId);
+    setEAction(eActId);
+    setPhase('engage');
+
+    setTimeout(() => setPhase('clash'), 400);
+
+    setTimeout(() => {
+      // 决定结果（简化版）
+      const random = Math.random();
+      const winner = random < 0.4 ? 'player' : (random < 0.7 ? 'enemy' : 'tie');
+      if (winner === 'player') {
+        setHit({ player: false, enemy: true });
+        setEHp(h => Math.max(0, h - 2));
+        const a = ACTIONS.find(x => x.id === actId);
+        setMsg(`${a.name}命中 · 对方 -2`);
+      } else if (winner === 'enemy') {
+        setHit({ player: true, enemy: false });
+        setPHp(h => Math.max(0, h - 2));
+        setMsg(`被反频率冲击 · 你 -2`);
+      } else {
+        setHit({ player: false, enemy: false });
+        setMsg(`频率对冲 · 双方平`);
+      }
+      setPhase('msg');
+
+      // 触发特写：如果选了爆响
+      if (actId === 'power' && winner === 'player') {
+        setTimeout(() => setSpecial('burst'), 100);
+        setTimeout(() => setSpecial(null), 1400);
+      }
+    }, 900);
+
+    setTimeout(() => {
+      setPhase('idle');
+      setPAction(null);
+      setEAction(null);
+      setHit({ player: false, enemy: false });
+      setMsg('选你的频率 · 同时回响');
+      setRound(r => r + 1);
+    }, 2600);
+  }
+
+  function triggerSpecial(type) {
+    if (type === 'burst') {
+      setSpecial('burst');
+      setTimeout(() => setSpecial(null), 1400);
+    } else if (type === 'win') {
+      setSpecial('win');
+      setTimeout(() => setSpecial(null), 2600);
+    } else if (type === 'break') {
+      setSlash(true);
+      setECharge(0);
+      setTimeout(() => setSlash(false), 700);
+    } else if (type === 'lowhp') {
+      setPHp(2);
+      setLowHpActive(true);
+      setTimeout(() => { setPHp(12); setLowHpActive(false); }, 4000);
+    } else if (type === 'reset') {
+      setPHp(12); setEHp(11);
+      setPCharge(3); setECharge(5);
+      setPEnergy(2); setEEnergy(2);
+      setLowHpActive(false);
+      setSpecial(null); setSlash(false);
+      setMsg('选你的频率 · 同时回响');
+    }
+  }
+
+  const pActionData = pAction ? ACTIONS.find(a => a.id === pAction) : null;
+  const eActionData = eAction ? ACTIONS.find(a => a.id === eAction) : null;
+
+  // 生成 18 个粒子
+  const particles = Array.from({length: 18}, (_, i) => ({
+    left: `${Math.random() * 100}%`,
+    delay: `${Math.random() * 8}s`,
+    duration: `${6 + Math.random() * 4}s`,
+  }));
+
+  return (
+    <div className="phone-shell">
+      <div className="aurora" />
+      <div className="scan-lines" />
+      <div className="particles">
+        {particles.map((p, i) => (
+          <div key={i} className="particle"
+               style={{ left: p.left, animationDelay: p.delay, animationDuration: p.duration }} />
+        ))}
+      </div>
+      <div className={`danger-vignette ${pHp / MAX_HP < 0.25 ? 'active' : ''}`} />
+
+      <div className="fx-controls">
+        <span style={{fontSize:9, color:'var(--text-faint)', alignSelf:'center', marginRight:6, letterSpacing:1}}>FX:</span>
+        <button className="fx-btn" onClick={() => triggerSpecial('burst')}>爆响特写</button>
+        <button className="fx-btn" onClick={() => triggerSpecial('break')}>破蓄斩切</button>
+        <button className="fx-btn" onClick={() => triggerSpecial('lowhp')}>低 HP</button>
+        <button className="fx-btn" onClick={() => triggerSpecial('win')}>胜利</button>
+        <button className="fx-btn" onClick={() => triggerSpecial('reset')}>↺ 重置</button>
+      </div>
+
+      <div style={{height: 36}} />  {/* 给顶部 control bar 让位 */}
+
+      <div className="topbar">
+        <div className="brand">Memoria · 共鸣对决</div>
+        <div className="tag">FX DEMO</div>
+      </div>
+
+      <div className="arena">
+        <Fighter side="enemy" letter="B" name="神秘人 · B"
+          hp={eHp} hpMax={MAX_HP}
+          energy={eEnergy} energyMax={MAX_ENERGY}
+          charge={eCharge} chargeMax={MAX_CHARGE}
+          hit={hit.enemy}
+          chargingBright={eCharge >= 7} />
+
+        <div className="battle-center">
+          <div className="round-num">ROUND {round}</div>
+          <div className="battle-msg">{msg}</div>
+        </div>
+
+        <Fighter side="player" letter="A" name="神秘人 · A"
+          hp={pHp} hpMax={MAX_HP}
+          energy={pEnergy} energyMax={MAX_ENERGY}
+          charge={pCharge} chargeMax={MAX_CHARGE}
+          hit={hit.player}
+          chargingBright={pCharge >= 7} />
+
+        {/* 出招撞击区 */}
+        {phase === 'clash' && (
+          <div className="clash-zone">
+            {eActionData && (
+              <div className="action-icon from-top"
+                   style={{ color: `var(--${eActionData.cls})` }}>
+                <ActionGlyph action={eAction} size={96} />
+              </div>
+            )}
+            {pActionData && (
+              <div className="action-icon from-bottom"
+                   style={{ color: `var(--${pActionData.cls})` }}>
+                <ActionGlyph action={pAction} size={96} />
+              </div>
+            )}
+            <div className="clash-burst fire" />
+          </div>
+        )}
+
+        {/* 破蓄斩切 */}
+        <div className={`break-slash ${slash ? 'fire' : ''}`} />
+      </div>
+
+      <div className="battle-actions">
+        <div className="action-grid">
+          {ACTIONS.map(a => (
+            <div key={a.id}
+                 className={`act-btn ${a.cls}`}
+                 onClick={() => pickAction(a.id)}>
+              <div className="ab-symbol"><ActionGlyph action={a.id} size={32} /></div>
+              <div className="ab-name">{a.name}</div>
+            </div>
+          ))}
+        </div>
+        <div className="hint">点动作 → 看出招分镜 · 顶部按钮看特写</div>
+      </div>
+
+      {/* 特写 overlay */}
+      {special === 'burst' && (
+        <div className="special-overlay burst">
+          <div className="special-text">爆响</div>
+        </div>
+      )}
+      {special === 'win' && (
+        <div className="special-overlay win">
+          <div className="special-text">RESONANCE</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>

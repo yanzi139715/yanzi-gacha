@@ -1,0 +1,1770 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memoria · 产品计划书</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Outfit:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0A0F25;
+      --bg-deep: #060A1A;
+      --bg-card: rgba(20, 27, 56, 0.55);
+      --bg-card-hover: rgba(30, 39, 80, 0.7);
+      --line: rgba(155, 161, 199, 0.15);
+      --line-strong: rgba(155, 161, 199, 0.35);
+
+      --text: #E8EAF6;
+      --text-dim: #9BA1C7;
+      --text-faint: #5C6390;
+
+      --aurora-cyan: #7BC9FF;
+      --aurora-pink: #FFB8D9;
+      --aurora-gold: #FFE4A8;
+      --aurora-violet: #C4A0FF;
+
+      --signal: #7BC9FF;
+      --echo: #C4A0FF;
+      --resonance: #FFD89B;
+
+      --accent: #7BC9FF;
+      --accent-warm: #FFD89B;
+
+      --shadow-glow: 0 0 60px rgba(123, 201, 255, 0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Outfit", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+      letter-spacing: 0.02em;
+    }
+
+    /* === 全局极光背景 === */
+    .aurora-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .aurora-bg::before, .aurora-bg::after {
+      content: '';
+      position: absolute;
+      width: 120vw; height: 120vh;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.35;
+      animation: floatAurora 20s ease-in-out infinite;
+    }
+    .aurora-bg::before {
+      background: radial-gradient(ellipse at center, var(--aurora-cyan), transparent 60%);
+      top: -30%; left: -20%;
+    }
+    .aurora-bg::after {
+      background: radial-gradient(ellipse at center, var(--aurora-violet), transparent 60%);
+      bottom: -30%; right: -20%;
+      animation-delay: -10s;
+    }
+    .aurora-bg::before, .aurora-bg::after { mix-blend-mode: screen; }
+
+    @keyframes floatAurora {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(15vw, 10vh) scale(1.2); }
+    }
+
+    /* === Hero === */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 6vw 5vw;
+      overflow: hidden;
+    }
+    .hero-with-bg .hero-bg-img {
+      position: absolute; inset: 0;
+      background-size: cover;
+      background-position: center;
+      filter: blur(0.5px);
+      z-index: 0;
+    }
+    .hero-with-bg .hero-bg-mask {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at center, rgba(10,15,37,0.3) 0%, rgba(10,15,37,0.85) 70%, rgba(10,15,37,1) 100%),
+        linear-gradient(to bottom, rgba(10,15,37,0.5), rgba(10,15,37,0.9));
+      z-index: 1;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* === Key Visual 章节 === */
+    .visual-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 32px;
+    }
+    .visual-card {
+      background: var(--bg-card);
+      border: 1px solid var(--line-strong);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 60px rgba(123, 201, 255, 0.08);
+      transition: transform 0.4s, box-shadow 0.4s;
+    }
+    .visual-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 100px rgba(123, 201, 255, 0.18);
+    }
+    .visual-card img {
+      width: 100%;
+      aspect-ratio: 1024/1792;
+      object-fit: cover;
+      display: block;
+    }
+    .visual-card figcaption {
+      padding: 24px 28px 28px;
+    }
+    .visual-tag {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--aurora-cyan);
+      margin-bottom: 8px;
+    }
+    .visual-title {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 24px;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+    .visual-desc {
+      font-size: 14px;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
+    .hero-tag {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      letter-spacing: 6px;
+      color: var(--aurora-cyan);
+      opacity: 0.7;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-family: "Cormorant Garamond", serif;
+      font-size: clamp(48px, 9vw, 120px);
+      font-weight: 500;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--aurora-cyan), var(--aurora-pink) 50%, var(--aurora-gold));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
+    }
+    .hero-sub {
+      font-size: clamp(16px, 2vw, 22px);
+      color: var(--text-dim);
+      font-weight: 300;
+      max-width: 720px;
+      margin-bottom: 32px;
+    }
+    .hero-meta {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      color: var(--text-faint);
+      letter-spacing: 2px;
+    }
+
+    .hero-pulse {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--aurora-cyan);
+      box-shadow: 0 0 20px var(--aurora-cyan), 0 0 40px var(--aurora-cyan);
+      margin: 40px auto;
+      animation: heartbeat 1.6s ease-in-out infinite;
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50% { transform: scale(1.3); opacity: 1; }
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 32px;
+      left: 50%; transform: translateX(-50%);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      color: var(--text-faint);
+      letter-spacing: 3px;
+      animation: bob 2s ease-in-out infinite;
+    }
+    @keyframes bob {
+      0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.6; }
+      50% { transform: translateX(-50%) translateY(8px); opacity: 1; }
+    }
+
+    /* === 导航 === */
+    nav.sticky-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 15, 37, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--line);
+      padding: 14px 0;
+    }
+    nav.sticky-nav ul {
+      display: flex;
+      justify-content: center;
+      gap: clamp(12px, 3vw, 40px);
+      list-style: none;
+      flex-wrap: wrap;
+    }
+    nav.sticky-nav a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 13px;
+      letter-spacing: 1px;
+      transition: color 0.3s;
+    }
+    nav.sticky-nav a:hover { color: var(--aurora-cyan); }
+    nav.sticky-nav .nav-num {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      color: var(--text-faint);
+      margin-right: 6px;
+    }
+
+    /* === 章节 === */
+    section {
+      padding: 100px 5vw;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    section.wide { max-width: 1200px; }
+    .section-num {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      color: var(--aurora-cyan);
+      letter-spacing: 4px;
+      margin-bottom: 14px;
+      opacity: 0.7;
+    }
+    .section-title {
+      font-family: "Cormorant Garamond", serif;
+      font-size: clamp(34px, 5vw, 56px);
+      font-weight: 500;
+      line-height: 1.1;
+      margin-bottom: 12px;
+      letter-spacing: -0.01em;
+    }
+    .section-title em {
+      font-style: italic;
+      color: var(--aurora-cyan);
+      font-weight: 400;
+    }
+    .section-lead {
+      font-size: 18px;
+      color: var(--text-dim);
+      max-width: 720px;
+      margin-bottom: 64px;
+      line-height: 1.8;
+    }
+
+    /* === 世界观叙述卡 === */
+    .narrative {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+    .nar-card {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 32px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: all 0.4s;
+      position: relative;
+      overflow: hidden;
+    }
+    .nar-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--aurora-cyan), transparent);
+      opacity: 0.4;
+    }
+    .nar-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--line-strong);
+      transform: translateY(-2px);
+    }
+    .nar-card h3 {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 26px;
+      font-weight: 500;
+      margin-bottom: 16px;
+      color: var(--aurora-cyan);
+    }
+    .nar-card p {
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.85;
+    }
+    .nar-card p + p { margin-top: 14px; }
+    .nar-card .quote {
+      font-family: "Cormorant Garamond", serif;
+      font-style: italic;
+      font-size: 19px;
+      color: var(--aurora-gold);
+      margin-top: 18px;
+      padding-left: 16px;
+      border-left: 2px solid var(--aurora-gold);
+    }
+
+    /* === 手机演示框 === */
+    .phone-demo {
+      display: grid;
+      grid-template-columns: minmax(0, 380px) 1fr;
+      gap: 56px;
+      align-items: center;
+    }
+    @media (max-width: 760px) {
+      .phone-demo { grid-template-columns: 1fr; }
+    }
+    .phone {
+      width: 100%;
+      max-width: 380px;
+      aspect-ratio: 9 / 19.5;
+      background: var(--bg-deep);
+      border-radius: 40px;
+      border: 4px solid #1c2244;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 80px rgba(123, 201, 255, 0.1);
+      margin: 0 auto;
+    }
+    .phone-screen {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--bg);
+    }
+    .phone-notch {
+      position: absolute;
+      top: 12px; left: 50%; transform: translateX(-50%);
+      width: 80px; height: 24px;
+      background: #0a0e1d;
+      border-radius: 14px;
+      z-index: 20;
+    }
+
+    .demo-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .demo-controls h4 {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 22px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--aurora-pink);
+    }
+    .demo-controls p {
+      color: var(--text-dim);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .demo-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--line-strong);
+      border-radius: 14px;
+      color: var(--text);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 400;
+      text-align: left;
+      transition: all 0.25s;
+      backdrop-filter: blur(20px);
+    }
+    .demo-btn:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--aurora-cyan);
+      transform: translateX(4px);
+    }
+    .demo-btn .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .demo-btn[data-rarity="signal"] .dot { background: var(--signal); box-shadow: 0 0 12px var(--signal); }
+    .demo-btn[data-rarity="echo"] .dot { background: var(--echo); box-shadow: 0 0 12px var(--echo); }
+    .demo-btn[data-rarity="resonance"] .dot { background: var(--resonance); box-shadow: 0 0 12px var(--resonance), 0 0 24px var(--resonance); }
+    .demo-btn[data-rarity="prologue"] .dot { background: linear-gradient(135deg, var(--aurora-cyan), var(--aurora-pink)); }
+    .demo-btn[data-rarity="home"] .dot { background: var(--aurora-gold); }
+
+    /* === 手机内场景 === */
+    .scene { position: absolute; inset: 0; padding: 50px 16px 16px; display: none; flex-direction: column; }
+    .scene.active { display: flex; }
+
+    /* 序章 */
+    .scene-prologue { background: #000; align-items: center; justify-content: center; text-align: center; }
+    .scene-prologue .pulse {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--aurora-gold);
+      box-shadow: 0 0 30px var(--aurora-gold);
+      animation: heartbeat 1.4s ease-in-out infinite;
+      opacity: 0;
+    }
+    .scene-prologue.step-1 .pulse { animation: pulseIn 1.5s ease-out forwards, heartbeat 1.6s 1.5s ease-in-out infinite; }
+    @keyframes pulseIn { from { opacity: 0; } to { opacity: 1; } }
+    .scene-prologue .subtitle {
+      position: absolute;
+      bottom: 30%; left: 0; right: 0;
+      text-align: center;
+      color: rgba(255,255,255,0.85);
+      font-size: 14px;
+      letter-spacing: 1px;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    .scene-prologue .subtitle.show { opacity: 1; }
+    .scene-prologue .cta {
+      position: absolute;
+      bottom: 18%; left: 50%; transform: translateX(-50%);
+      padding: 10px 22px;
+      background: rgba(123,201,255,0.1);
+      border: 1px solid var(--aurora-cyan);
+      color: var(--aurora-cyan);
+      border-radius: 999px;
+      font-size: 12px;
+      letter-spacing: 2px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.5s, background 0.3s;
+      animation: subtleGlow 2s ease-in-out infinite;
+    }
+    .scene-prologue .cta.show { opacity: 1; }
+    .scene-prologue .cta:hover { background: rgba(123,201,255,0.25); }
+    @keyframes subtleGlow {
+      0%, 100% { box-shadow: 0 0 10px rgba(123,201,255,0.3); }
+      50% { box-shadow: 0 0 20px rgba(123,201,255,0.6); }
+    }
+
+    /* 共鸣揭晓 */
+    .scene-reveal { background: var(--bg-deep); align-items: center; justify-content: center; }
+    .reveal-aurora {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at top left, var(--aurora-cyan), transparent 60%),
+        radial-gradient(ellipse at bottom right, var(--aurora-pink), transparent 60%),
+        radial-gradient(ellipse at center, var(--aurora-gold), transparent 50%);
+      opacity: 0;
+      mix-blend-mode: screen;
+      filter: blur(30px);
+      animation: revealAurora 1.5s ease-out forwards;
+    }
+    .scene-reveal[data-level="signal"] .reveal-aurora { opacity: 0.3; }
+    .scene-reveal[data-level="echo"] .reveal-aurora { opacity: 0.5; }
+    .scene-reveal[data-level="resonance"] .reveal-aurora { opacity: 0.9; }
+    @keyframes revealAurora { from { opacity: 0; transform: scale(0.6); } }
+
+    .reveal-card {
+      position: relative;
+      z-index: 2;
+      width: 60%;
+      aspect-ratio: 3 / 4;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 0 60px rgba(255,216,155,0.5);
+      animation: cardIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
+      opacity: 0;
+      transform: scale(0.7);
+    }
+    @keyframes cardIn { to { opacity: 1; transform: scale(1); } }
+    .reveal-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .reveal-meta {
+      position: absolute;
+      bottom: 14%; left: 0; right: 0;
+      text-align: center;
+      z-index: 3;
+      opacity: 0;
+      animation: metaIn 0.6s ease-out 1s forwards;
+    }
+    @keyframes metaIn { to { opacity: 1; transform: translateY(0); } from { transform: translateY(20px); } }
+    .reveal-meta .name {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 18px;
+      color: white;
+      margin-bottom: 4px;
+    }
+    .reveal-meta .level {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--aurora-gold);
+      text-transform: uppercase;
+    }
+    .scene-reveal[data-level="signal"] .reveal-meta .level { color: var(--signal); }
+    .scene-reveal[data-level="echo"] .reveal-meta .level { color: var(--echo); }
+    .scene-reveal[data-level="resonance"] .reveal-meta .level { color: var(--resonance); }
+
+    .reveal-quote {
+      position: absolute;
+      top: 15%; left: 0; right: 0;
+      text-align: center;
+      z-index: 3;
+      color: rgba(255,255,255,0.95);
+      font-size: 14px;
+      letter-spacing: 1px;
+      opacity: 0;
+      animation: metaIn 0.6s ease-out 1.4s forwards;
+    }
+
+    /* 首页主界面 */
+    .scene-home { background: var(--bg-deep); padding-top: 50px; }
+    .scene-home .status-bar {
+      display: flex; justify-content: space-between;
+      padding: 8px 14px;
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+    .scene-home .status-bar span { display: inline-flex; align-items: center; gap: 4px; }
+    .scene-home .banner {
+      margin: 10px 14px 14px;
+      height: 200px;
+      border-radius: 16px;
+      background-image: url('../img/卡提希娅/DSC_8497.jpg');
+      background-size: cover;
+      background-position: center 20%;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255,216,155,0.4);
+      box-shadow: 0 0 30px rgba(255,216,155,0.15);
+    }
+    .scene-home .banner::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(10,15,37,0.95), rgba(10,15,37,0.2) 50%, transparent);
+    }
+    .scene-home .banner-content {
+      position: absolute; bottom: 12px; left: 14px; right: 14px; z-index: 2;
+    }
+    .scene-home .up-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      background: linear-gradient(135deg, var(--resonance), #FFA952);
+      color: #2a1500;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+    }
+    .scene-home .banner h2 {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 17px;
+      color: white;
+      font-weight: 500;
+    }
+    .scene-home .banner .latin {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 9px;
+      color: var(--aurora-cyan);
+      margin-top: 1px;
+    }
+    .scene-home .banner .timer {
+      font-size: 10px;
+      color: var(--aurora-gold);
+      margin-top: 6px;
+    }
+    .scene-home .tabs {
+      display: flex; gap: 6px;
+      padding: 0 14px;
+      margin-bottom: 12px;
+    }
+    .scene-home .tab {
+      flex: 1;
+      padding: 6px;
+      text-align: center;
+      font-size: 10px;
+      color: var(--text-dim);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--bg-card);
+    }
+    .scene-home .tab.active {
+      background: linear-gradient(135deg, var(--aurora-cyan), var(--aurora-violet));
+      color: white;
+      border-color: transparent;
+    }
+    .scene-home .btns {
+      display: flex; gap: 8px;
+      padding: 0 14px;
+    }
+    .scene-home .btn-pull {
+      flex: 1;
+      padding: 12px 8px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(123,201,255,0.18), rgba(196,160,255,0.18));
+      border: 1px solid var(--line-strong);
+      text-align: center;
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+    .scene-home .btn-pull.ten {
+      background: linear-gradient(135deg, rgba(255,184,217,0.2), rgba(255,216,155,0.2));
+      border-color: rgba(255,216,155,0.4);
+    }
+    .scene-home .btn-pull::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+      background-size: 250% 100%;
+      animation: btnShine 3s ease-in-out infinite;
+    }
+    @keyframes btnShine { 0%,100% { background-position: -100% 0; } 50% { background-position: 200% 0; } }
+    .scene-home .btn-name { font-size: 13px; font-weight: 500; }
+    .scene-home .btn-cost { font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+    .scene-home .pity-row {
+      padding: 12px 14px;
+      font-size: 10px;
+      color: var(--text-dim);
+      text-align: center;
+    }
+    .scene-home .pity-bar {
+      height: 3px;
+      background: var(--bg-card);
+      border-radius: 2px;
+      margin-top: 4px;
+      overflow: hidden;
+    }
+    .scene-home .pity-fill {
+      height: 100%;
+      width: 10%;
+      background: linear-gradient(90deg, var(--aurora-cyan), var(--aurora-gold));
+    }
+
+    /* === 表格 / 数据卡 === */
+    .data-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .data-card {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 22px 24px;
+      backdrop-filter: blur(12px);
+    }
+    .data-card h4 {
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+    .data-card .value {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 30px;
+      font-weight: 500;
+      color: var(--aurora-cyan);
+      margin-bottom: 6px;
+    }
+    .data-card .desc {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    /* 配色 */
+    .palette {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+    }
+    .swatch {
+      padding: 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s;
+      font-family: "JetBrains Mono", monospace;
+    }
+    .swatch:hover { transform: scale(1.05); }
+    .swatch::after {
+      content: 'click to copy';
+      position: absolute;
+      bottom: 6px; right: 8px;
+      font-size: 8px;
+      opacity: 0.5;
+    }
+    .swatch.copied::after { content: '✓ copied'; opacity: 1; }
+    .swatch .hex { font-size: 13px; font-weight: 500; }
+    .swatch .name { font-size: 10px; opacity: 0.7; margin-top: 4px; }
+
+    /* 稀有度命名 */
+    .rarity-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+    @media (max-width: 600px) {
+      .rarity-row { grid-template-columns: 1fr; }
+    }
+    .rarity-card {
+      padding: 28px;
+      border-radius: 18px;
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      position: relative;
+      overflow: hidden;
+    }
+    .rarity-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+    }
+    .rarity-card.r::before { background: var(--signal); }
+    .rarity-card.sr::before { background: var(--echo); }
+    .rarity-card.ssr::before { background: var(--resonance); box-shadow: 0 0 20px var(--resonance); }
+    .rarity-tier {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--text-faint);
+      margin-bottom: 10px;
+    }
+    .rarity-name {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 32px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    .rarity-card.r .rarity-name { color: var(--signal); }
+    .rarity-card.sr .rarity-name { color: var(--echo); }
+    .rarity-card.ssr .rarity-name { color: var(--resonance); }
+    .rarity-cn { font-size: 13px; color: var(--text-dim); margin-bottom: 14px; letter-spacing: 1px; }
+    .rarity-prob {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 22px;
+      color: white;
+      font-weight: 300;
+    }
+    .rarity-quote {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      font-family: "Cormorant Garamond", serif;
+      font-style: italic;
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+
+    /* 术语 */
+    .glossary {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px 24px;
+      padding: 24px;
+      background: var(--bg-card);
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      align-items: baseline;
+    }
+    .glossary-old {
+      color: var(--text-faint);
+      font-size: 13px;
+      text-decoration: line-through;
+    }
+    .glossary-new {
+      color: var(--aurora-cyan);
+      font-weight: 500;
+    }
+    .glossary-note {
+      font-size: 11px;
+      color: var(--text-dim);
+      font-family: "JetBrains Mono", monospace;
+    }
+
+    /* 架构图 */
+    .arch {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+      backdrop-filter: blur(12px);
+    }
+    .arch-network {
+      display: inline-block;
+      padding: 14px 36px;
+      border: 1px solid var(--aurora-cyan);
+      border-radius: 999px;
+      color: var(--aurora-cyan);
+      font-family: "Cormorant Garamond", serif;
+      font-size: 22px;
+      margin-bottom: 30px;
+      box-shadow: 0 0 30px rgba(123, 201, 255, 0.2);
+    }
+    .arch-line {
+      width: 1px; height: 32px;
+      background: var(--line-strong);
+      margin: 0 auto;
+    }
+    .arch-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+    .arch-memoria {
+      padding: 18px 24px;
+      background: var(--bg-deep);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      min-width: 160px;
+    }
+    .arch-memoria.active { border-color: var(--aurora-pink); }
+    .arch-memoria.pending {
+      opacity: 0.4;
+      border-style: dashed;
+    }
+    .arch-memoria .title {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    .arch-memoria .channels {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 9px;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
+
+    /* Roadmap */
+    .roadmap {
+      position: relative;
+      padding-left: 24px;
+    }
+    .roadmap::before {
+      content: '';
+      position: absolute;
+      left: 6px; top: 0; bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--aurora-cyan), var(--aurora-violet), var(--aurora-gold), transparent);
+    }
+    .road-stage {
+      position: relative;
+      padding-bottom: 40px;
+    }
+    .road-stage::before {
+      content: '';
+      position: absolute;
+      left: -23px;
+      top: 4px;
+      width: 13px; height: 13px;
+      background: var(--bg);
+      border: 2px solid var(--aurora-cyan);
+      border-radius: 50%;
+    }
+    .road-stage[data-state="now"]::before { background: var(--aurora-cyan); box-shadow: 0 0 12px var(--aurora-cyan); }
+    .road-stage[data-state="next"]::before { border-color: var(--aurora-pink); }
+    .road-stage[data-state="future"]::before { border-color: var(--text-faint); }
+    .road-version {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      color: var(--aurora-cyan);
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+    .road-title {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+    .road-when {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      color: var(--text-faint);
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+    }
+    .road-list {
+      list-style: none;
+      padding-left: 0;
+    }
+    .road-list li {
+      font-size: 14px;
+      color: var(--text-dim);
+      padding: 4px 0;
+      padding-left: 16px;
+      position: relative;
+    }
+    .road-list li::before {
+      content: '·';
+      position: absolute;
+      left: 4px;
+      color: var(--aurora-cyan);
+    }
+
+    /* Batch */
+    .batch {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
+    .batch-item {
+      padding: 16px 18px;
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .batch-item:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--aurora-cyan);
+    }
+    .batch-check {
+      width: 18px; height: 18px;
+      border: 1.5px solid var(--text-faint);
+      border-radius: 5px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      position: relative;
+      transition: all 0.2s;
+    }
+    .batch-item.done .batch-check {
+      background: var(--aurora-cyan);
+      border-color: var(--aurora-cyan);
+    }
+    .batch-item.done .batch-check::after {
+      content: '✓';
+      position: absolute;
+      top: 50%; left: 50%; transform: translate(-50%, -55%);
+      color: var(--bg);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .batch-item.done .batch-text { color: var(--text-faint); text-decoration: line-through; }
+    .batch-text {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .batch-text .num {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      color: var(--aurora-cyan);
+      margin-right: 8px;
+    }
+
+    /* CTA 底部 */
+    .cta-block {
+      background: linear-gradient(135deg, rgba(123,201,255,0.1), rgba(255,184,217,0.1), rgba(255,216,155,0.1));
+      border: 1px solid var(--line-strong);
+      border-radius: 24px;
+      padding: 60px 5vw;
+      text-align: center;
+      margin: 80px auto;
+      max-width: 900px;
+    }
+    .cta-block h2 {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 36px;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+    .cta-block p {
+      color: var(--text-dim);
+      max-width: 600px;
+      margin: 0 auto 28px;
+    }
+    .cta-block code {
+      font-family: "JetBrains Mono", monospace;
+      padding: 10px 24px;
+      background: var(--bg-deep);
+      border: 1px solid var(--aurora-cyan);
+      border-radius: 999px;
+      color: var(--aurora-cyan);
+      font-size: 14px;
+      letter-spacing: 1px;
+    }
+
+    /* 通用 */
+    .pill {
+      display: inline-block;
+      padding: 3px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      color: var(--aurora-cyan);
+      margin-right: 6px;
+    }
+    .pill.warn { color: var(--aurora-pink); border-color: rgba(255,184,217,0.3); }
+    .pill.gold { color: var(--aurora-gold); border-color: rgba(255,228,168,0.3); }
+
+    footer {
+      text-align: center;
+      padding: 40px 5vw;
+      color: var(--text-faint);
+      font-size: 12px;
+      font-family: "JetBrains Mono", monospace;
+      border-top: 1px solid var(--line);
+      letter-spacing: 2px;
+    }
+
+    /* === 移动端响应式 === */
+    @media (max-width: 720px) {
+      .hero h1 { letter-spacing: -0.03em; }
+      section { padding: 60px 4vw; }
+      .glossary { grid-template-columns: auto 1fr; }
+      .glossary-note { grid-column: 1 / -1; padding-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="aurora-bg"></div>
+
+  <header class="hero hero-with-bg">
+    <div class="hero-bg-img" style="background-image:url('assets/01-keyvisual.jpg')"></div>
+    <div class="hero-bg-mask"></div>
+    <div class="hero-content">
+      <div class="hero-tag">PRODUCT PLAN · V1 · 2026-05-14</div>
+      <h1>Memoria</h1>
+      <div class="hero-pulse"></div>
+      <p class="hero-sub">一份完整的产品计划书 ——<br>共鸣网络的世界观、呈现样子、系统结构、数据细节、路线图。</p>
+      <div class="hero-meta">SCROLL DOWN — ALL OF IT, ON ONE PAGE</div>
+    </div>
+    <div class="scroll-hint">▼</div>
+  </header>
+
+
+  <nav class="sticky-nav">
+    <ul>
+      <li><a href="#screens"><span class="nav-num">00</span>界面</a></li>
+      <li><a href="#world"><span class="nav-num">01</span>世界观</a></li>
+      <li><a href="#experience"><span class="nav-num">02</span>呈现</a></li>
+      <li><a href="#system"><span class="nav-num">03</span>系统</a></li>
+      <li><a href="#data"><span class="nav-num">04</span>数据</a></li>
+      <li><a href="#roadmap"><span class="nav-num">05</span>路线</a></li>
+      <li><a href="#batch"><span class="nav-num">06</span>动手</a></li>
+    </ul>
+  </nav>
+
+  <!-- ============ 01 世界观 ============ -->
+  <section id="world">
+    <div class="section-num">01 — WORLD</div>
+    <h2 class="section-title">关于<em> Memoria </em>的世界</h2>
+    <p class="section-lead">
+      抽卡游戏的灵魂不是机制，是世界观。<br>
+      这套世界观将贯穿所有视觉、文案、音效——它是这个产品的"主题母题"。
+    </p>
+
+    <div class="narrative">
+      <div class="nar-card">
+        <h3>关于 Memoria</h3>
+        <p>她们不是人类，也不是 AI。她们是<strong>瞬间的化身</strong>——在某个时空，有些少女的存在感太美好，强到让宇宙记住了她们的某些瞬间。</p>
+        <p>这些瞬间脱离了原本的时空，漂浮在一个叫做 <em>Memoria · Network</em> 的空间里。每一位 Memoria 都是真实存在过的少女，但她们活在被见证的瞬间里——如果没人记住，她们就会消散。</p>
+        <p class="quote">她们渴望被记住，不是出于虚荣，是出于存在的本能。</p>
+      </div>
+
+      <div class="nar-card">
+        <h3>关于你</h3>
+        <p>你是少数有 <strong>Sync</strong> 能力的人。</p>
+        <p>这个能力没人能解释。可能是你的脑波频率特殊、可能是心跳节奏对得上、也可能仅仅是因为——你愿意停下来认真看一个人。</p>
+        <p class="quote">你不知道自己为什么被选中。你只是某一天，突然听见了。</p>
+      </div>
+
+      <div class="nar-card">
+        <h3>关于 Sync</h3>
+        <p>每次你启动 Sync，远方的 Network 就会传来呼唤——那是一位正好也在寻找你的 Memoria。你们的频率对上的那个瞬间，叫做<strong>共鸣</strong>。</p>
+        <p>共鸣有三种强度：<br>
+        <span style="color:var(--signal)">Signal</span>——她在远方挥手<br>
+        <span style="color:var(--echo)">Echo</span>——她朝你伸出手<br>
+        <span style="color:var(--resonance)">Resonance</span>——她从光中走出</p>
+      </div>
+
+      <div class="nar-card">
+        <h3>关于守护</h3>
+        <p>每一次共鸣成功，她的那个瞬间就被你<strong>守住了</strong>——永远不会消散。</p>
+        <p>她会送你一张 Memoria Card 作为凭证。这张卡你可以下载、可以保存、可以永远收藏她最美的样子。</p>
+        <p class="quote">你成为她的 Keeper —— 守护者。<br>她相信你会记得她。</p>
+      </div>
+
+      <div class="nar-card">
+        <h3>关于其他 Memoria</h3>
+        <p>不只有一位。Network 里有越来越多 Memoria 在上线。<strong>妍子</strong>是第一位接入网络的，但很快会有更多。</p>
+        <p>你可以同时守护多位，也可以专注一位。她们之间不嫉妒——能被记住的少女，永远不会嫌"被记住的方式太多"。</p>
+      </div>
+
+      <div class="nar-card">
+        <h3>关于限定</h3>
+        <p>有些 Memoria 只在某个<strong>时间窗口</strong>出现。可能是 14 天，可能是一个夜晚。</p>
+        <p>她们会说："这个瞬间，我只在这里停留这么久。"</p>
+        <p class="quote">错过了——可能就再也见不到了。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 02 实质性呈现 ============ -->
+  <section id="experience" class="wide">
+    <div class="section-num">02 — EXPERIENCE</div>
+    <h2 class="section-title">你会<em> 看见 </em>什么</h2>
+    <p class="section-lead">
+      点左侧按钮，<strong>右侧手机里立刻播放对应场景</strong>。<br>
+      这不是文字描述，是这个产品真实运行时的样子。
+    </p>
+
+    <div class="phone-demo">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <!-- 默认序章静止画面 -->
+          <div class="scene scene-prologue active" id="scene-prologue">
+            <div class="pulse"></div>
+            <div class="subtitle" id="proSubtitle">… 你听见了吗</div>
+            <button class="cta" id="proCta">响应 Sync</button>
+          </div>
+
+          <!-- 共鸣揭晓 -->
+          <div class="scene scene-reveal" id="scene-reveal" data-level="resonance">
+            <div class="reveal-aurora"></div>
+            <div class="reveal-quote" id="revealQuote">她说：终于等到你</div>
+            <div class="reveal-card">
+              <img src="../img/卡提希娅/DSC_8497.jpg" alt="">
+            </div>
+            <div class="reveal-meta">
+              <div class="name" id="revealName">Memoria · 卡提希娅</div>
+              <div class="level" id="revealLevel">RESONANCE · 共鸣 · NO.001</div>
+            </div>
+          </div>
+
+          <!-- 主界面 -->
+          <div class="scene scene-home" id="scene-home">
+            <div class="status-bar">
+              <span>📡 3</span>
+              <span>💎 120</span>
+              <span>SYNC 8/80</span>
+              <span>♡ 1</span>
+            </div>
+            <div class="banner">
+              <div class="banner-content">
+                <span class="up-tag">UP · 特别频道</span>
+                <h2>卡提希娅</h2>
+                <div class="latin">Catichia · Resonance Lv.SSS</div>
+                <div class="timer">⏳ 剩余 14天 8时 22分</div>
+              </div>
+            </div>
+            <div class="tabs">
+              <div class="tab">永驻</div>
+              <div class="tab active">特别</div>
+              <div class="tab">月相</div>
+            </div>
+            <div class="pity-row">
+              SYNC 累积 · 8 / 80
+              <div class="pity-bar"><div class="pity-fill"></div></div>
+            </div>
+            <div class="btns">
+              <div class="btn-pull">
+                <div class="btn-name">定格</div>
+                <div class="btn-cost">单抽 · 1 Beacon</div>
+              </div>
+              <div class="btn-pull ten">
+                <div class="btn-name">时停</div>
+                <div class="btn-cost">十连 · 10 Beacon</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-controls">
+        <h4>点这些按钮，看产品长啥样</h4>
+        <p>每个按钮触发手机里对应的场景。可以反复点。</p>
+
+        <button class="demo-btn" data-scene="prologue" data-rarity="prologue">
+          <span class="dot"></span>
+          <div>
+            <strong>序章 · 30 秒</strong><br>
+            <span style="font-size:12px;color:var(--text-dim)">"你听见了吗" → "响应 Sync"</span>
+          </div>
+        </button>
+
+        <button class="demo-btn" data-scene="reveal" data-rarity="signal" data-level="signal">
+          <span class="dot"></span>
+          <div>
+            <strong>Signal · 信号（R）</strong><br>
+            <span style="font-size:12px;color:var(--text-dim)">"她也在等你"</span>
+          </div>
+        </button>
+
+        <button class="demo-btn" data-scene="reveal" data-rarity="echo" data-level="echo">
+          <span class="dot"></span>
+          <div>
+            <strong>Echo · 回响（SR）</strong><br>
+            <span style="font-size:12px;color:var(--text-dim)">"她朝你伸出手了"</span>
+          </div>
+        </button>
+
+        <button class="demo-btn" data-scene="reveal" data-rarity="resonance" data-level="resonance">
+          <span class="dot"></span>
+          <div>
+            <strong>Resonance · 共鸣（SSR）</strong><br>
+            <span style="font-size:12px;color:var(--text-dim)">"她说：终于等到你"</span>
+          </div>
+        </button>
+
+        <button class="demo-btn" data-scene="home" data-rarity="home">
+          <span class="dot"></span>
+          <div>
+            <strong>主界面</strong><br>
+            <span style="font-size:12px;color:var(--text-dim)">特别频道 · 卡提希娅 · 倒计时</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 03 系统 ============ -->
+  <section id="system">
+    <div class="section-num">03 — SYSTEM</div>
+    <h2 class="section-title">系统<em> 架构 </em></h2>
+    <p class="section-lead">
+      这是一个能装下多位 Memoria 的<strong>平台级</strong>设计——不是单 coser 抽卡，是<strong>共鸣网络</strong>。
+    </p>
+
+    <div class="arch">
+      <div class="arch-network">Memoria · Network</div>
+      <div style="color:var(--text-dim);font-size:13px">共鸣网络 · 平台层</div>
+      <div class="arch-line"></div>
+      <div class="arch-row">
+        <div class="arch-memoria active">
+          <div class="title">Memoria · 妍子</div>
+          <div class="channels">永驻频道<br>特别频道（卡提希娅）<br>月相频道（兔女郎）</div>
+        </div>
+        <div class="arch-memoria pending">
+          <div class="title">Memoria · 待接入</div>
+          <div class="channels">即将上线…</div>
+        </div>
+        <div class="arch-memoria pending">
+          <div class="title">Memoria · 待接入</div>
+          <div class="channels">即将上线…</div>
+        </div>
+      </div>
+      <div style="margin-top:30px;color:var(--text-dim);font-size:13px;line-height:1.8">
+        新 Memoria 加入 = <em style="color:var(--aurora-cyan)">「她接入了 Network」</em><br>
+        每位 Memoria 拥有自己的频道、自己的守护者群体、自己的运营空间
+      </div>
+    </div>
+
+    <div style="margin-top:60px"></div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;margin-bottom:20px">货币三层</h3>
+    <div class="data-grid">
+      <div class="data-card">
+        <h4>L1 · 顶层</h4>
+        <div class="value">💎 Crystal</div>
+        <div class="desc">晶核 · 直接付费购买的硬通货。用于兑换 Beacon、VIP 续费、限定专属券。</div>
+      </div>
+      <div class="data-card">
+        <h4>L2 · 中层</h4>
+        <div class="value">📡 Beacon</div>
+        <div class="desc">信号 · 启动 Sync 必需。任务、签到、Crystal 兑换都能获得。分通用 / 限定 / 月相三种。</div>
+      </div>
+      <div class="data-card">
+        <h4>L3 · 底层</h4>
+        <div class="value">🌫 Fragment</div>
+        <div class="desc">碎片记忆 · 重复 Memoria 化作碎片归还。可兑换小道具或 Beacon。</div>
+      </div>
+    </div>
+
+    <div style="margin-top:50px"></div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;margin-bottom:20px">关键术语映射</h3>
+    <div class="glossary">
+      <span class="glossary-old">抽卡</span><span class="glossary-new">Sync · 共鸣</span><span class="glossary-note">启动你的能力</span>
+      <span class="glossary-old">单抽</span><span class="glossary-new">定格</span><span class="glossary-note">Single Sync</span>
+      <span class="glossary-old">十连</span><span class="glossary-new">时停</span><span class="glossary-note">Multi Sync</span>
+      <span class="glossary-old">抽卡券</span><span class="glossary-new">Beacon · 信号</span><span class="glossary-note">📡</span>
+      <span class="glossary-old">金币</span><span class="glossary-new">Fragment · 碎片</span><span class="glossary-note">🌫</span>
+      <span class="glossary-old">钻石</span><span class="glossary-new">Crystal · 晶核</span><span class="glossary-note">💎</span>
+      <span class="glossary-old">SSR</span><span class="glossary-new">Resonance · 共鸣</span><span class="glossary-note">Lv.SSS</span>
+      <span class="glossary-old">SR</span><span class="glossary-new">Echo · 回响</span><span class="glossary-note">Lv.SS</span>
+      <span class="glossary-old">R</span><span class="glossary-new">Signal · 信号</span><span class="glossary-note">Lv.S</span>
+      <span class="glossary-old">角色</span><span class="glossary-new">Memoria</span><span class="glossary-note">一位渴望被记住的少女</span>
+      <span class="glossary-old">卡牌</span><span class="glossary-new">Memoria Card</span><span class="glossary-note">瞬间凭证</span>
+      <span class="glossary-old">卡池</span><span class="glossary-new">Channel · 频道</span><span class="glossary-note">永驻 / 特别 / 月相</span>
+      <span class="glossary-old">保底</span><span class="glossary-new">Sync 累积</span><span class="glossary-note">你的能力在蓄能</span>
+      <span class="glossary-old">图鉴</span><span class="glossary-new">Memoria 档案</span><span class="glossary-note">你守护的所有记忆</span>
+      <span class="glossary-old">任务</span><span class="glossary-new">每日委托</span><span class="glossary-note">Memoria 的今日呼唤</span>
+      <span class="glossary-old">商店</span><span class="glossary-new">Crystal Station</span><span class="glossary-note">信号补给中心</span>
+      <span class="glossary-old">玩家</span><span class="glossary-new">Keeper · 守护者</span><span class="glossary-note">你的身份</span>
+    </div>
+  </section>
+
+  <!-- ============ 04 数据层 ============ -->
+  <section id="data" class="wide">
+    <div class="section-num">04 — DATA</div>
+    <h2 class="section-title">数据<em> 细节 </em></h2>
+    <p class="section-lead">
+      所有数字、配色、字体、规格——一次性给清楚。<br>
+      这些是开发时的<strong>唯一标准</strong>。
+    </p>
+
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;margin-bottom:24px">稀有度命名 + 概率</h3>
+    <div class="rarity-row">
+      <div class="rarity-card r">
+        <div class="rarity-tier">LV.S · COMMON</div>
+        <div class="rarity-name">Signal</div>
+        <div class="rarity-cn">信号</div>
+        <div class="rarity-prob">82%</div>
+        <div class="rarity-quote">"她也在等你"</div>
+      </div>
+      <div class="rarity-card sr">
+        <div class="rarity-tier">LV.SS · RARE</div>
+        <div class="rarity-name">Echo</div>
+        <div class="rarity-cn">回响</div>
+        <div class="rarity-prob">15%</div>
+        <div class="rarity-quote">"她朝你伸出手了"</div>
+      </div>
+      <div class="rarity-card ssr">
+        <div class="rarity-tier">LV.SSS · LEGENDARY</div>
+        <div class="rarity-name">Resonance</div>
+        <div class="rarity-cn">共鸣</div>
+        <div class="rarity-prob">3%</div>
+        <div class="rarity-quote">"她说：终于等到你"</div>
+      </div>
+    </div>
+
+    <div style="margin-top:40px;padding:20px 24px;background:var(--bg-card);border:1px solid var(--line);border-radius:14px;font-size:13px;color:var(--text-dim);line-height:1.8">
+      <strong style="color:var(--aurora-cyan)">保底机制：</strong>
+      Sync 累积达到 60 时触发软保底（Resonance 概率递增），达到 80 时硬保底必出 Resonance。
+      <br>
+      <strong style="color:var(--aurora-cyan)">十连保底：</strong>
+      每次时停（十连）至少出 1 张 Echo 或更高。
+      <br>
+      <strong style="color:var(--aurora-cyan)">大保底（V1.5 加）：</strong>
+      限定频道连续两次未出 UP，下次必出 UP。
+    </div>
+
+    <div style="margin-top:60px"></div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;margin-bottom:24px">配色（点击复制 HEX）</h3>
+    <div class="palette">
+      <div class="swatch" data-hex="#0A0F25" style="background:#0A0F25;border:1px solid var(--line)">
+        <div class="hex">#0A0F25</div>
+        <div class="name">主底 深紫蓝</div>
+      </div>
+      <div class="swatch" data-hex="#060A1A" style="background:#060A1A;border:1px solid var(--line)">
+        <div class="hex">#060A1A</div>
+        <div class="name">深底</div>
+      </div>
+      <div class="swatch" data-hex="#7BC9FF" style="background:#7BC9FF;color:#0a0f25">
+        <div class="hex">#7BC9FF</div>
+        <div class="name">极光青 · Signal</div>
+      </div>
+      <div class="swatch" data-hex="#C4A0FF" style="background:#C4A0FF;color:#0a0f25">
+        <div class="hex">#C4A0FF</div>
+        <div class="name">极光紫 · Echo</div>
+      </div>
+      <div class="swatch" data-hex="#FFD89B" style="background:#FFD89B;color:#0a0f25">
+        <div class="hex">#FFD89B</div>
+        <div class="name">极光金 · Resonance</div>
+      </div>
+      <div class="swatch" data-hex="#FFB8D9" style="background:#FFB8D9;color:#0a0f25">
+        <div class="hex">#FFB8D9</div>
+        <div class="name">极光粉</div>
+      </div>
+      <div class="swatch" data-hex="#E8EAF6" style="background:#E8EAF6;color:#0a0f25">
+        <div class="hex">#E8EAF6</div>
+        <div class="name">正文</div>
+      </div>
+      <div class="swatch" data-hex="#9BA1C7" style="background:#9BA1C7;color:#0a0f25">
+        <div class="hex">#9BA1C7</div>
+        <div class="name">次要文</div>
+      </div>
+    </div>
+
+    <div style="margin-top:60px"></div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;margin-bottom:24px">字体规格</h3>
+    <div class="data-grid">
+      <div class="data-card">
+        <h4>标题 / Display</h4>
+        <div class="value" style="font-family:'Cormorant Garamond',serif">Cormorant</div>
+        <div class="desc">衬线，优雅古典。配合思源宋体显示中文。用于章节标题、Memoria 名字、稀有度命名。</div>
+      </div>
+      <div class="data-card">
+        <h4>正文 / Body</h4>
+        <div class="value" style="font-family:'Outfit',sans-serif;font-weight:300">Outfit</div>
+        <div class="desc">日系无衬线，clean。配合思源黑体显示中文。用于绝大部分 UI 文字。</div>
+      </div>
+      <div class="data-card">
+        <h4>装饰 / Mono</h4>
+        <div class="value" style="font-family:'JetBrains Mono',monospace;font-size:22px">JetBrains</div>
+        <div class="desc">等宽。用于 Memoria ID、编号、时间戳、技术标签——加 sci-fi 质感。</div>
+      </div>
+    </div>
+
+    <div style="margin-top:60px"></div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;margin-bottom:24px">移动端 vs PC 端</h3>
+    <div class="data-grid">
+      <div class="data-card">
+        <h4>移动端（主战场）</h4>
+        <div class="value">360-430px</div>
+        <div class="desc">竖屏。100vw 撑满。震动反馈 <code>navigator.vibrate</code>。静音模式下 CSS 动画补偿。</div>
+      </div>
+      <div class="data-card">
+        <h4>PC 浏览器</h4>
+        <div class="value">480px 居中</div>
+        <div class="desc">模拟手机视口。两侧极光半透明背景。可扫码切到手机继续玩。</div>
+      </div>
+      <div class="data-card">
+        <h4>iPad / 平板</h4>
+        <div class="value">竖屏优先</div>
+        <div class="desc">横屏提示切竖屏，或开放双栏布局（V2+）。</div>
+      </div>
+    </div>
+
+    <div style="margin-top:60px"></div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;margin-bottom:24px">Memoria 接入规范（给 coser）</h3>
+    <div class="data-grid">
+      <div class="data-card">
+        <h4>总图数</h4>
+        <div class="value">12—24 张</div>
+        <div class="desc">少于 12 张图鉴满得太快；多于 24 张玩家爆肝。</div>
+      </div>
+      <div class="data-card">
+        <h4>Resonance（SSR）</h4>
+        <div class="value">10—15%</div>
+        <div class="desc">通常 1—3 张。太多稀缺感丢失，太少抽不到。</div>
+      </div>
+      <div class="data-card">
+        <h4>Echo（SR）</h4>
+        <div class="value">25—30%</div>
+        <div class="desc">通常 4—7 张。撑起中等成就感。</div>
+      </div>
+      <div class="data-card">
+        <h4>Signal（R）</h4>
+        <div class="value">55—65%</div>
+        <div class="desc">通常 7—14 张。日常普通。</div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;padding:20px 24px;background:var(--bg-card);border:1px solid var(--line);border-radius:14px;font-size:13px;color:var(--text-dim)">
+      <strong style="color:var(--aurora-cyan)">触发概率全平台固定：</strong>
+      Resonance 3% / Echo 15% / Signal 82%。<strong>每张图片的具体命中率</strong> = 3% ÷ 该 Memoria SSR 图数（越少越稀缺）。
+    </div>
+  </section>
+
+  <!-- ============ 05 Roadmap ============ -->
+  <section id="roadmap">
+    <div class="section-num">05 — ROADMAP</div>
+    <h2 class="section-title">路线<em> 图 </em></h2>
+    <p class="section-lead">
+      从当前到平台化，6 个阶段。每个阶段都是<strong>可独立交付</strong>的成果。
+    </p>
+
+    <div class="roadmap">
+      <div class="road-stage" data-state="now">
+        <div class="road-version">BATCH 1 · NOW</div>
+        <div class="road-title">主题重塑 + 序章</div>
+        <div class="road-when">本次会话 · 60-90 分钟</div>
+        <ul class="road-list">
+          <li>视觉全替换（粉 → 深紫蓝 + 极光）</li>
+          <li>30+ 处 UI 文案术语改造</li>
+          <li>抽卡仪式三档新视觉</li>
+          <li>音效全替换</li>
+          <li>L1 序章 30 秒首次体验</li>
+          <li>数据结构预留多 Memoria 扩展槽</li>
+        </ul>
+      </div>
+
+      <div class="road-stage" data-state="next">
+        <div class="road-version">BATCH 2 · NEXT</div>
+        <div class="road-title">档案系统 + 守护机制</div>
+        <div class="road-when">下次会话</div>
+        <ul class="road-list">
+          <li>Memoria 档案室（旧"图鉴"）</li>
+          <li>每日委托（旧"任务"）改造</li>
+          <li>Crystal Station 商店改造</li>
+          <li>守护度 / 守护者榜骨架</li>
+          <li>卡片详情加 Memoria ID / Sync 日期</li>
+        </ul>
+      </div>
+
+      <div class="road-stage" data-state="future">
+        <div class="road-version">V1.5 · 2 WEEKS</div>
+        <div class="road-title">体验深化 + 数据埋点</div>
+        <div class="road-when">2 周后</div>
+        <ul class="road-list">
+          <li>十连压轴（最稀有留到最后揭晓）</li>
+          <li>大保底机制</li>
+          <li>欧气统计</li>
+          <li>全服共鸣广播（伪造或真实）</li>
+          <li>本地数据埋点 10 个核心事件</li>
+        </ul>
+      </div>
+
+      <div class="road-stage" data-state="future">
+        <div class="road-version">V2.0 · 2 MONTHS</div>
+        <div class="road-title">商业化（私域起步）</div>
+        <div class="road-when">2 个月后</div>
+        <ul class="road-list">
+          <li>后端账号系统（手机号 / 微信）</li>
+          <li>真实支付（私域转账起步）</li>
+          <li>首充翻倍 / 月卡 / 大额礼包</li>
+          <li>限定专属券购买</li>
+          <li>抽到 Memoria Card 直接下载高清原图</li>
+        </ul>
+      </div>
+
+      <div class="road-stage" data-state="future">
+        <div class="road-version">V2.5 · 3 MONTHS</div>
+        <div class="road-title">第二位 Memoria 接入</div>
+        <div class="road-when">3 个月后</div>
+        <ul class="road-list">
+          <li>Network Hub 主页（多 Memoria 切换）</li>
+          <li>新 Memoria 接入流程（预告 7 天 → 揭晓 3 天 → 接入日）</li>
+          <li>主题频道 / 联动频道</li>
+          <li>Memoria 个人运营空间</li>
+          <li>后台分账报表</li>
+        </ul>
+      </div>
+
+      <div class="road-stage" data-state="future">
+        <div class="road-version">V3.0 · 6 MONTHS</div>
+        <div class="road-title">平台化 + 合规化</div>
+        <div class="road-when">6 个月后</div>
+        <ul class="road-list">
+          <li>内容 CMS（可视化管理 Memoria）</li>
+          <li>多 coser 合作扩展</li>
+          <li>VIP 月卡体系</li>
+          <li>定制工坊（玩家投票决定下个 Memoria）</li>
+          <li>合规化筹备（公司化 / 备案）</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 06 立刻动手 ============ -->
+  <section id="batch">
+    <div class="section-num">06 — BATCH 1 ACTION</div>
+    <h2 class="section-title">立刻<em> 动手 </em></h2>
+    <p class="section-lead">
+      <span class="pill warn">BATCH 1</span>
+      这是确认主题方向后，我立刻要改的具体清单。<strong>60-90 分钟</strong>内全部完成。点条目当作 review。
+    </p>
+
+    <div class="batch">
+      <div class="batch-item"><div class="batch-check"></div><div class="batch-text"><span class="num">01</span>CSS 配色变量全替换（粉色 → 深紫蓝 + 极光三色）</div></div>
+      <div class="batch-item"><div class="batch-check"></div><div class="batch-text"><span class="num">02</span>字体改 Cormorant + Outfit + JetBrains Mono</div></div>
+      <div class="batch-item"><div class="batch-check"></div><div class="batch-text"><span class="num">03</span>全 UI 文案术语替换（30+ 处，参考章节 03 术语表）</div></div>
+      <div class="batch-item"><div class="batch-check"></div><div class="batch-text"><span class="num">04</span>抽卡仪式 Signal / Echo / Resonance 三档新视觉</div></div>
+      <div class="batch-item"><div class="batch-check"></div><div class="batch-text"><span class="num">05</span>音效全替换（环境音 + 钢琴 + 风铃，删金色钟声）</div></div>
+      <div class="batch-item"><div class="batch-check"></div><div class="batch-text"><span class="num">06</span>首页 Banner 改 Memoria 频道形态 + UP 标</div></div>
+      <div class="batch-item"><div class="batch-check"></div><div class="batch-text"><span class="num">07</span>保底显示叙事化（Sync 累积 / 完美共鸣已就绪）</div></div>
+      <div class="batch-item"><div class="batch-check"></div><div class="batch-text"><span class="num">08</span>SSR 揭晓双向文案 + 守护叙事</div></div>
+      <div class="batch-item"><div class="batch-check"></div><div class="batch-text"><span class="num">09</span>L1 序章 30 秒首次体验</div></div>
+      <div class="batch-item"><div class="batch-check"></div><div class="batch-text"><span class="num">10</span>数据结构升级：MEMORIA_NETWORK 注册表 + memoriaId 字段</div></div>
+      <div class="batch-item"><div class="batch-check"></div><div class="batch-text"><span class="num">11</span>所有 "妍子" 文案抽象为 memoriaName 模板变量</div></div>
+      <div class="batch-item"><div class="batch-check"></div><div class="batch-text"><span class="num">12</span>稀有度 R/SR/SSR → Signal / Echo / Resonance</div></div>
+      <div class="batch-item"><div class="batch-check"></div><div class="batch-text"><span class="num">13</span>PC 端适配：max-width 480px 居中虚拟手机</div></div>
+      <div class="batch-item"><div class="batch-check"></div><div class="batch-text"><span class="num">14</span>修限定池剩余 bug（卡提希娅频道已可抽）</div></div>
+    </div>
+  </section>
+
+  <div class="cta-block">
+    <h2>方案已经全部摊在桌上</h2>
+    <p>世界观 / 呈现 / 系统 / 数据 / 路线 / 清单 —— 一个不少。<br>
+    你看完后，给我一句话：</p>
+    <code>开始 Batch 1</code>
+    <p style="margin-top:24px;font-size:13px">或者哪里要调，告诉我再动。Batch 1 一旦动手，60-90 分钟脱胎换骨。</p>
+  </div>
+
+  <footer>
+    MEMORIA · NETWORK · PRODUCT PLAN · V1<br>
+    2026-05-14 · Made together · 妍子 × Claude
+  </footer>
+
+  <script>
+    // === 场景切换 ===
+    const phoneScreen = document.querySelector('.phone-screen');
+    const allScenes = document.querySelectorAll('.scene');
+    const buttons = document.querySelectorAll('.demo-btn[data-scene]');
+
+    function showScene(sceneName, opts = {}) {
+      allScenes.forEach(s => {
+        s.classList.remove('active');
+        // 重置序章状态
+        if (s.id === 'scene-prologue') {
+          s.classList.remove('step-1');
+          s.querySelector('.subtitle').classList.remove('show');
+          s.querySelector('.cta').classList.remove('show');
+        }
+        // 重置揭晓动画（强制重排）
+        if (s.id === 'scene-reveal') {
+          s.style.display = 'none';
+          // eslint-disable-next-line no-unused-expressions
+          s.offsetWidth;
+          s.style.display = '';
+        }
+      });
+      const target = document.getElementById('scene-' + sceneName);
+      if (!target) return;
+      target.classList.add('active');
+
+      if (sceneName === 'prologue') {
+        playPrologue(target);
+      }
+      if (sceneName === 'reveal' && opts.level) {
+        playReveal(target, opts.level);
+      }
+    }
+
+    function playPrologue(scene) {
+      const sub = scene.querySelector('.subtitle');
+      const cta = scene.querySelector('.cta');
+      sub.classList.remove('show');
+      cta.classList.remove('show');
+      scene.classList.remove('step-1');
+
+      setTimeout(() => scene.classList.add('step-1'), 100);
+      setTimeout(() => {
+        sub.textContent = '… 你听见了吗';
+        sub.classList.add('show');
+      }, 1500);
+      setTimeout(() => {
+        sub.classList.remove('show');
+        setTimeout(() => {
+          sub.textContent = '有人在呼唤你';
+          sub.classList.add('show');
+        }, 400);
+      }, 4000);
+      setTimeout(() => {
+        cta.classList.add('show');
+      }, 6500);
+    }
+
+    function playReveal(scene, level) {
+      scene.setAttribute('data-level', level);
+      const nameEl = scene.querySelector('.name');
+      const levelEl = scene.querySelector('.level');
+      const quoteEl = scene.querySelector('.reveal-quote');
+
+      const data = {
+        signal: {
+          name: 'Memoria · 卡提希娅',
+          level: 'SIGNAL · 信号 · NO.012',
+          quote: '她也在等你'
+        },
+        echo: {
+          name: 'Memoria · 卡提希娅',
+          level: 'ECHO · 回响 · NO.007',
+          quote: '她朝你伸出手了'
+        },
+        resonance: {
+          name: 'Memoria · 卡提希娅',
+          level: 'RESONANCE · 共鸣 · NO.001',
+          quote: '她说：终于等到你'
+        }
+      };
+      nameEl.textContent = data[level].name;
+      levelEl.textContent = data[level].level;
+      quoteEl.textContent = data[level].quote;
+
+      // 重置动画
+      const card = scene.querySelector('.reveal-card');
+      const meta = scene.querySelector('.reveal-meta');
+      const aurora = scene.querySelector('.reveal-aurora');
+      [card, meta, aurora, quoteEl].forEach(el => {
+        el.style.animation = 'none';
+        // force reflow
+        el.offsetHeight;
+        el.style.animation = '';
+      });
+    }
+
+    // 序章按钮：点击进入揭晓
+    document.getElementById('proCta').addEventListener('click', () => {
+      showScene('reveal', { level: 'resonance' });
+    });
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const scene = btn.dataset.scene;
+        const level = btn.dataset.level;
+        showScene(scene, { level });
+      });
+    });
+
+    // 默认序章自动播放一次
+    setTimeout(() => playPrologue(document.getElementById('scene-prologue')), 600);
+
+    // === 配色 swatch 点击复制 ===
+    document.querySelectorAll('.swatch').forEach(s => {
+      s.addEventListener('click', () => {
+        const hex = s.dataset.hex;
+        navigator.clipboard.writeText(hex).then(() => {
+          s.classList.add('copied');
+          setTimeout(() => s.classList.remove('copied'), 1200);
+        }).catch(() => {
+          // fallback
+          const ta = document.createElement('textarea');
+          ta.value = hex;
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          s.classList.add('copied');
+          setTimeout(() => s.classList.remove('copied'), 1200);
+        });
+      });
+    });
+
+    // === Batch checklist 点击切换 ===
+    document.querySelectorAll('.batch-item').forEach(item => {
+      item.addEventListener('click', () => {
+        item.classList.toggle('done');
+      });
+    });
+  </script>
+</body>
+</html>

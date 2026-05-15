@@ -1,0 +1,17 @@
+# 开发文档 / 内部规格——不部署到生产
+docs/
+
+# 隔壁 AI 给的设计稿——内部参考，不公开
+_design-explorations/
+
+# 历史备份文件
+*.bak.html
+*.bak.css
+*.v1.bak.*
+battle/index.backup.html
+index.v1.bak.html
+css/style.v1.bak.css
+
+# 系统垃圾
+.DS_Store
+**/.DS_Store

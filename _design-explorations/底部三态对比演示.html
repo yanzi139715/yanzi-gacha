@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>底部决策区 · 三态对比</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Outfit:wght@200;300;400;500&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0F25;
+  --line: rgba(155, 161, 199, 0.18);
+  --line-strong: rgba(155, 161, 199, 0.4);
+  --text: #E8EAF6;
+  --text-dim: #9BA1C7;
+  --text-faint: #5C6390;
+  --signal: #7BC9FF;
+  --echo: #C4A0FF;
+  --resonance: #FFD89B;
+  --aurora-pink: #FFB8D9;
+  --danger: #FF6B8A;
+  --energy: #7BC9FF;
+  --charge: #FFD89B;
+  --attack: #FF8A5C;
+  --power: #FFD24A;
+  --block: #7BC9FF;
+  --guard: #C4A0FF;
+  --chargec: #6BE3A0;
+  --breakc: #B580FF;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(123,201,255,0.06), transparent 50%),
+    radial-gradient(ellipse at 80% 90%, rgba(196,160,255,0.06), transparent 50%),
+    #050816;
+  color: var(--text);
+  font-family: "Outfit", -apple-system, "PingFang SC", sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+  user-select: none;
+}
+
+.demo-page {
+  padding: 56px 64px;
+}
+.demo-head {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.demo-head h1 {
+  font-family: "LXGW WenKai", "Noto Serif SC", "Cormorant Garamond", serif;
+  font-size: 38px;
+  font-weight: 500;
+  background: linear-gradient(135deg, var(--signal), var(--aurora-pink) 50%, var(--resonance));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  letter-spacing: 4px;
+  margin-bottom: 12px;
+}
+.demo-head .sub {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 4px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+}
+
+.state-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 48px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.state-card {
+  display: flex; flex-direction: column;
+}
+.state-num {
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  font-size: 56px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -1px;
+  margin-bottom: 8px;
+}
+.state-num.s1 { color: var(--resonance); }
+.state-num.s2 { color: var(--attack); }
+.state-num.s3 { color: var(--power); }
+.state-cn {
+  font-family: "LXGW WenKai", "Noto Serif SC", serif;
+  font-size: 22px;
+  letter-spacing: 4px;
+  color: white;
+  margin-bottom: 6px;
+}
+.state-en {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  margin-bottom: 18px;
+}
+.state-desc {
+  font-family: "Noto Serif SC", serif;
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--text-dim);
+  margin-bottom: 28px;
+  min-height: 44px;
+}
+.state-desc strong {
+  color: var(--resonance);
+  font-weight: 500;
+}
+
+/* 底部 tray 复制 */
+.tray-mock {
+  width: 100%;
+  background: linear-gradient(to top, rgba(5,8,22,0.97), rgba(5,8,22,0.7) 80%, transparent);
+  border: 1px solid rgba(155,161,199,0.12);
+  border-radius: 18px;
+  padding: 14px 14px 18px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(14px);
+}
+.tray-mock::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 100px;
+  background:
+    radial-gradient(ellipse at 30% 0%, rgba(123,201,255,0.08), transparent 60%),
+    radial-gradient(ellipse at 70% 0%, rgba(196,160,255,0.08), transparent 60%);
+  pointer-events: none;
+}
+
+.tray-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 2px 8px 10px;
+}
+.tray-head .label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px; letter-spacing: 3px;
+  color: rgba(255,255,255,0.32);
+  text-transform: uppercase;
+}
+.help-btn {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.22);
+  color: rgba(255,255,255,0.55);
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0; line-height: 1;
+}
+
+.action-strip {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  padding: 6px 0 10px;
+  margin-bottom: 10px;
+}
+.action-strip .gap {
+  flex-shrink: 0;
+  width: 14px;
+}
+.act-ico {
+  background: none; border: none; cursor: pointer;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 10px 2px 8px;
+  position: relative;
+  flex: 1;
+  transition: all 0.32s;
+  font-family: inherit;
+}
+.act-ico .icon-wrap {
+  width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.55);
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));
+}
+.act-ico .icon-wrap svg { width: 100%; height: 100%; }
+.act-ico .en-tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 8px; letter-spacing: 2.2px;
+  color: rgba(255,255,255,0.32);
+  margin-top: 7px;
+  text-transform: uppercase;
+}
+
+.action-strip.has-selected .act-ico:not(.selected) .icon-wrap { color: rgba(255,255,255,0.2); }
+.action-strip.has-selected .act-ico:not(.selected) .en-tag { color: rgba(255,255,255,0.16); }
+
+.act-ico.selected { transform: translateY(-5px); }
+.act-ico.selected .icon-wrap {
+  color: var(--resonance);
+  transform: scale(1.18);
+  filter:
+    drop-shadow(0 0 8px rgba(255,216,155,0.7))
+    drop-shadow(0 0 16px rgba(255,216,155,0.35));
+}
+.act-ico.selected .en-tag {
+  color: var(--resonance);
+  opacity: 0.95;
+}
+.act-ico.selected::before {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 50%;
+  transform: translateX(-50%);
+  width: 26px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--resonance) 30%, var(--resonance) 70%, transparent);
+  box-shadow: 0 0 6px var(--resonance);
+}
+.act-ico.selected::after {
+  content: '';
+  position: absolute;
+  top: -2px; left: 50%;
+  transform: translateX(-50%);
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--resonance);
+  box-shadow: 0 0 6px var(--resonance), 0 0 14px var(--resonance);
+}
+
+/* commit-preview */
+.commit-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 9px 14px;
+  margin: 6px 0 6px;
+  font-family: "LXGW WenKai", "Noto Serif SC", "Cormorant Garamond", serif;
+  font-size: 13px;
+  letter-spacing: 2.5px;
+  color: rgba(255,255,255,0.92);
+  background: linear-gradient(90deg, transparent, rgba(255,216,155,0.1), transparent);
+  border-top: 1px solid rgba(255,216,155,0.25);
+  border-bottom: 1px solid rgba(255,216,155,0.25);
+  text-align: center;
+  min-height: 38px;
+}
+.commit-preview .arrow {
+  color: var(--resonance);
+  font-style: italic;
+  text-shadow: 0 0 10px var(--resonance);
+}
+.commit-preview .result {
+  color: var(--power);
+  font-weight: 600;
+  text-shadow: 0 0 8px rgba(255,210,74,0.6);
+}
+.commit-preview .effect { color: rgba(255,255,255,0.9); }
+.commit-preview .effect.risk { color: var(--danger); opacity: 0.85; }
+.commit-preview .effect.gold { color: var(--resonance); }
+.commit-preview .effect.cyan { color: var(--signal); }
+.commit-preview .dot { color: var(--resonance); opacity: 0.5; }
+.commit-preview.tactical .arrow {
+  color: var(--power);
+  font-style: normal;
+}
+
+/* commit-btn */
+.commit-btn {
+  margin-top: 6px;
+  padding: 11px 14px;
+  background:
+    linear-gradient(180deg, rgba(255,216,155,0.18), rgba(255,184,217,0.1) 50%, rgba(255,216,155,0.2));
+  border: 1px solid var(--resonance);
+  border-radius: 8px;
+  color: white;
+  font-family: "LXGW WenKai", "Noto Serif SC", "Cormorant Garamond", serif;
+  font-size: 16px;
+  letter-spacing: 8px;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  width: 100%;
+  display: block;
+  box-shadow:
+    0 0 18px rgba(255,216,155,0.35),
+    inset 0 0 24px rgba(255,216,155,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.15),
+    inset 0 -1px 0 rgba(0,0,0,0.3);
+  text-shadow: 0 0 12px rgba(255,216,155,0.6), 0 1px 2px rgba(0,0,0,0.5);
+}
+.commit-btn.disabled {
+  background: rgba(20,27,56,0.5);
+  border-color: rgba(155,161,199,0.3);
+  color: rgba(255,255,255,0.5);
+  box-shadow: none;
+  text-shadow: none;
+  cursor: not-allowed;
+}
+
+.callout {
+  margin-top: 24px;
+  padding: 12px 14px;
+  background: rgba(8,12,28,0.5);
+  border-left: 2px solid var(--resonance);
+  border-radius: 0 8px 8px 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10.5px;
+  line-height: 1.7;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+}
+.callout strong { color: var(--resonance); font-weight: 500; letter-spacing: 1px; }
+.callout .key { color: var(--signal); }
+.callout .risk-c { color: var(--danger); }
+
+.footer-summary {
+  margin-top: 64px;
+  padding: 24px 32px;
+  background: rgba(8,12,28,0.5);
+  border-top: 1px solid rgba(255,216,155,0.25);
+  border-bottom: 1px solid rgba(255,216,155,0.25);
+  max-width: 1080px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+.footer-summary h3 {
+  font-family: "LXGW WenKai", "Noto Serif SC", serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--resonance);
+  letter-spacing: 4px;
+  margin-bottom: 12px;
+}
+.footer-summary p {
+  font-family: "Noto Serif SC", serif;
+  font-size: 13px;
+  line-height: 1.85;
+  color: var(--text-dim);
+  font-weight: 300;
+}
+.footer-summary strong { color: white; font-weight: 500; }
+
+.action-glyph { width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+
+<div class="demo-page">
+  <div class="demo-head">
+    <h1>底 部 决 策 区 · 三 态 自 适 应</h1>
+    <div class="sub">commit-preview adapts · action-aware decision feedback</div>
+  </div>
+
+  <div class="state-grid">
+
+    <!-- 状态 ① idle -->
+    <div class="state-card">
+      <div class="state-num s1">01</div>
+      <div class="state-cn">未 选 任 何 动 作</div>
+      <div class="state-en">idle · tactical hint</div>
+      <div class="state-desc">玩家还在权衡时，<strong>战术提示</strong>占住空间——基于实时局势给出 AI 一句话建议（蓄能差、HP 危、可终结时机）。</div>
+
+      <div class="tray-mock">
+        <div class="tray-head">
+          <div class="label">choose your frequency</div>
+          <button class="help-btn">?</button>
+        </div>
+        <div class="action-strip">
+          <button class="act-ico"><div class="icon-wrap"><svg class="action-glyph" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 18 50 L 70 50"/><path d="M 56 32 L 84 50 L 56 68"/></svg></div><div class="en-tag">attack</div></button>
+          <button class="act-ico"><div class="icon-wrap"><svg class="action-glyph" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="50" r="10" fill="currentColor" stroke="none"/><line x1="50" y1="12" x2="50" y2="28"/><line x1="50" y1="72" x2="50" y2="88"/><line x1="12" y1="50" x2="28" y2="50"/><line x1="72" y1="50" x2="88" y2="50"/><line x1="24" y1="24" x2="34" y2="34"/><line x1="66" y1="66" x2="76" y2="76"/><line x1="76" y1="24" x2="66" y2="34"/><line x1="34" y1="66" x2="24" y2="76"/></svg></div><div class="en-tag">power</div></button>
+          <div class="gap"></div>
+          <button class="act-ico"><div class="icon-wrap"><svg class="action-glyph" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 50 14 L 80 25 V 50 Q 80 76 50 88 Q 20 76 20 50 V 25 Z"/><path d="M 38 50 L 46 58 L 62 42"/></svg></div><div class="en-tag">block</div></button>
+          <button class="act-ico"><div class="icon-wrap"><svg class="action-glyph" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="50,12 84,32 84,68 50,88 16,68 16,32"/><line x1="50" y1="12" x2="50" y2="88"/><line x1="16" y1="32" x2="84" y2="68"/><line x1="84" y1="32" x2="16" y2="68"/></svg></div><div class="en-tag">guard</div></button>
+          <div class="gap"></div>
+          <button class="act-ico"><div class="icon-wrap"><svg class="action-glyph" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 30 78 Q 38 60, 50 50 Q 62 40, 70 22"/><path d="M 58 22 L 72 22 L 72 36"/><circle cx="30" cy="78" r="3" fill="currentColor" stroke="none"/></svg></div><div class="en-tag">charge</div></button>
+          <button class="act-ico"><div class="icon-wrap"><svg class="action-glyph" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="50" r="26" stroke-dasharray="6 5"/><line x1="22" y1="22" x2="78" y2="78"/><line x1="78" y1="22" x2="22" y2="78"/></svg></div><div class="en-tag">break</div></button>
+        </div>
+        <div class="commit-preview tactical">
+          <span class="arrow">⚠</span>
+          <span class="effect gold">对方蓄能 5 · 警惕穿透</span>
+          <span class="dot">·</span>
+          <span class="effect cyan">你 ✦6 · 可终结</span>
+        </div>
+        <button class="commit-btn disabled">选 一 个 动 作</button>
+      </div>
+
+      <div class="callout">
+        <strong>填充策略</strong><br>
+        基于实时状态规则生成 1-2 条 hint：<br>
+        · <span class="risk-c">对方蓄能 ≥5</span> → 警惕穿透<br>
+        · <span class="key">你蓄能 ≥5</span> → 可终结时机<br>
+        · 对方连蓄 ≥2 → 可散频破<br>
+        · 默认 → ⚖ 双方均势
+      </div>
+    </div>
+
+    <!-- 状态 ② 触达 -->
+    <div class="state-card">
+      <div class="state-num s2">02</div>
+      <div class="state-cn">选 中 触 达</div>
+      <div class="state-en">attack · damage preview</div>
+      <div class="state-desc">玩家瞥按钮后立即看到<strong>预演伤害 + 连击 buff + 风险标注</strong>——红色文字提示"若被反"。不打开规则也能瞬时决策。</div>
+
+      <div class="tray-mock">
+        <div class="tray-head">
+          <div class="label">choose your frequency</div>
+          <button class="help-btn">?</button>
+        </div>
+        <div class="action-strip has-selected">
+          <button class="act-ico selected"><div class="icon-wrap"><svg class="action-glyph" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 18 50 L 70 50"/><path d="M 56 32 L 84 50 L 56 68"/></svg></div><div class="en-tag">attack</div></button>
+          <button class="act-ico"><div class="icon-wrap"><svg class="action-glyph" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="50" r="10" fill="currentColor" stroke="none"/><line x1="50" y1="12" x2="50" y2="28"/><line x1="50" y1="72" x2="50" y2="88"/><line x1="12" y1="50" x2="28" y2="50"/><line x1="72" y1="50" x2="88" y2="50"/><line x1="24" y1="24" x2="34" y2="34"/><line x1="66" y1="66" x2="76" y2="76"/><line x1="76" y1="24" x2="66" y2="34"/><line x1="34" y1="66" x2="24" y2="76"/></svg></div><div class="en-tag">power</div></button>
+          <div class="gap"></div>
+          <button class="act-ico"><div class="icon-wrap"><svg class="action-glyph" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 50 14 L 80 25 V 50 Q 80 76 50 88 Q 20 76 20 50 V 25 Z"/><path d="M 38 50 L 46 58 L 62 42"/></svg></div><div class="en-tag">block</div></button>
+          <button class="act-ico"><div class="icon-wrap"><svg class="action-glyph" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="50,12 84,32 84,68 50,88 16,68 16,32"/><line x1="50" y1="12" x2="50" y2="88"/><line x1="16" y1="32" x2="84" y2="68"/><line x1="84" y1="32" x2="16" y2="68"/></svg></div><div class="en-tag">guard</div></button>
+          <div class="gap"></div>
+          <button class="act-ico"><div class="icon-wrap"><svg class="action-glyph" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 30 78 Q 38 60, 50 50 Q 62 40, 70 22"/><path d="M 58 22 L 72 22 L 72 36"/><circle cx="30" cy="78" r="3" fill="currentColor" stroke="none"/></svg></div><div class="en-tag">charge</div></button>
+          <button class="act-ico"><div class="icon-wrap"><svg class="action-glyph" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="50" r="26" stroke-dasharray="6 5"/><line x1="22" y1="22" x2="78" y2="78"/><line x1="78" y1="22" x2="22" y2="78"/></svg></div><div class="en-tag">break</div></button>
+        </div>
+        <div class="commit-preview">
+          <span class="arrow">→</span>
+          <span class="result">伤害 3</span>
+          <span class="dot">·</span>
+          <span class="effect">连击 +1</span>
+          <span class="dot">·</span>
+          <span class="effect risk">若被反 扣 1 中断</span>
+        </div>
+        <button class="commit-btn">出 招 · 触 达</button>
+      </div>
+
+      <div class="callout">
+        <strong>预演公式</strong><br>
+        · 伤害 = <span class="key">attackBase + min(combo, comboMax)</span><br>
+        · 连击 +1（若不被反伤）<br>
+        · <span class="risk-c">风险</span>：被守护/凝固反伤、连击清零
+      </div>
+    </div>
+
+    <!-- 状态 ③ 爆响 -->
+    <div class="state-card">
+      <div class="state-num s3">03</div>
+      <div class="state-cn">选 中 爆 响</div>
+      <div class="state-en">power · ultimate preview</div>
+      <div class="state-desc">大招特化预演——<strong>消耗几点蓄能 → 几伤害 → 是否穿透 → 共鸣值清零</strong>。爆响 ≥5 显示"穿透打断"金句，玩家瞬间看出"全 in 时刻"。</div>
+
+      <div class="tray-mock">
+        <div class="tray-head">
+          <div class="label">choose your frequency</div>
+          <button class="help-btn">?</button>
+        </div>
+        <div class="action-strip has-selected">
+          <button class="act-ico"><div class="icon-wrap"><svg class="action-glyph" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 18 50 L 70 50"/><path d="M 56 32 L 84 50 L 56 68"/></svg></div><div class="en-tag">attack</div></button>
+          <button class="act-ico selected"><div class="icon-wrap"><svg class="action-glyph" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="50" r="10" fill="currentColor" stroke="none"/><line x1="50" y1="12" x2="50" y2="28"/><line x1="50" y1="72" x2="50" y2="88"/><line x1="12" y1="50" x2="28" y2="50"/><line x1="72" y1="50" x2="88" y2="50"/><line x1="24" y1="24" x2="34" y2="34"/><line x1="66" y1="66" x2="76" y2="76"/><line x1="76" y1="24" x2="66" y2="34"/><line x1="34" y1="66" x2="24" y2="76"/></svg></div><div class="en-tag">power</div></button>
+          <div class="gap"></div>
+          <button class="act-ico"><div class="icon-wrap"><svg class="action-glyph" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 50 14 L 80 25 V 50 Q 80 76 50 88 Q 20 76 20 50 V 25 Z"/><path d="M 38 50 L 46 58 L 62 42"/></svg></div><div class="en-tag">block</div></button>
+          <button class="act-ico"><div class="icon-wrap"><svg class="action-glyph" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="50,12 84,32 84,68 50,88 16,68 16,32"/><line x1="50" y1="12" x2="50" y2="88"/><line x1="16" y1="32" x2="84" y2="68"/><line x1="84" y1="32" x2="16" y2="68"/></svg></div><div class="en-tag">guard</div></button>
+          <div class="gap"></div>
+          <button class="act-ico"><div class="icon-wrap"><svg class="action-glyph" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 30 78 Q 38 60, 50 50 Q 62 40, 70 22"/><path d="M 58 22 L 72 22 L 72 36"/><circle cx="30" cy="78" r="3" fill="currentColor" stroke="none"/></svg></div><div class="en-tag">charge</div></button>
+          <button class="act-ico"><div class="icon-wrap"><svg class="action-glyph" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="50" r="26" stroke-dasharray="6 5"/><line x1="22" y1="22" x2="78" y2="78"/><line x1="78" y1="22" x2="22" y2="78"/></svg></div><div class="en-tag">break</div></button>
+        </div>
+        <div class="commit-preview">
+          <span class="arrow">→</span>
+          <span class="result">伤害 7</span>
+          <span class="dot">·</span>
+          <span class="effect gold">穿透打断</span>
+          <span class="dot">·</span>
+          <span class="effect">共鸣值清零</span>
+        </div>
+        <button class="commit-btn">出 招 · 爆 响 6 ✦</button>
+      </div>
+
+      <div class="callout">
+        <strong>预演公式</strong><br>
+        · 伤害 = <span class="key">1 + 消耗蓄能</span><br>
+        · <span class="key">≥5 点</span> → "穿透打断"金句（触达打不断）<br>
+        · 自身共鸣清零、连蓄重置
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-summary">
+    <h3>核 心 思 路</h3>
+    <p>
+      底部 <strong>commit-preview</strong> 不再为单一动作（爆响）服务——而是变成<strong>决策反馈中心</strong>。<br>
+      <strong>视觉重量恒定 ~80px</strong>，内容总在变：未选时填战术提示，选定时填预演结果。<br>
+      玩家眼睛锁定底部就能完成"权衡 → 选择 → 验证"的完整闭环——这才是博弈游戏 UI 的灵魂。
+    </p>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Memoria · 方向 A · 频率剧场 · Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Outfit:wght@200;300;400;500&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0A0F25;
+  --bg-deep: #060A1A;
+  --bg-card: rgba(20, 27, 56, 0.65);
+  --line: rgba(155, 161, 199, 0.18);
+  --line-strong: rgba(155, 161, 199, 0.4);
+  --text: #E8EAF6;
+  --text-dim: #9BA1C7;
+  --text-faint: #5C6390;
+  --signal: #7BC9FF;
+  --echo: #C4A0FF;
+  --resonance: #FFD89B;
+  --aurora-pink: #FFB8D9;
+  --danger: #FF6B8A;
+  --hp: #FF6B8A;
+  --energy: #7BC9FF;
+  --charge: #FFD89B;
+  --attack: #FF8A5C;
+  --power: #FFD24A;
+  --block: #7BC9FF;
+  --guard: #C4A0FF;
+  --chargec: #6BE3A0;
+  --breakc: #B580FF;
+
+  --char-A: #FF6B8A;
+  --char-B: #C4A0FF;
+  --char-C: #7BC9FF;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(123,201,255,0.08), transparent 50%),
+    radial-gradient(ellipse at 80% 90%, rgba(196,160,255,0.08), transparent 50%),
+    #050816;
+  color: var(--text);
+  font-family: "Outfit", -apple-system, "PingFang SC", sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+  user-select: none;
+}
+
+.gallery-header {
+  padding: 40px 48px 24px;
+  display: flex;
+  align-items: baseline;
+  gap: 32px;
+}
+.gallery-header h1 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 28px;
+  font-weight: 500;
+  background: linear-gradient(135deg, var(--signal), var(--aurora-pink) 50%, var(--resonance));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  letter-spacing: 1px;
+}
+.gallery-header .subtitle {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+}
+
+.gallery {
+  display: flex;
+  gap: 48px;
+  padding: 0 48px 64px;
+  align-items: flex-start;
+  overflow-x: auto;
+}
+.screen-frame {
+  flex-shrink: 0;
+}
+.screen-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+  display: block;
+  text-transform: uppercase;
+}
+.screen-label .num {
+  color: var(--resonance);
+  margin-right: 8px;
+}
+
+.phone-shell {
+  width: 420px;
+  height: 860px;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+  border-radius: 36px;
+  border: 4px solid #1a2240;
+  box-shadow: 0 0 0 1px rgba(123,201,255,0.2), 0 30px 80px rgba(0,0,0,0.7), 0 0 60px rgba(123,201,255,0.12);
+}
+
+/* ============ 共享：背景层 ============ */
+.aurora { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.aurora::before, .aurora::after {
+  content: ''; position: absolute;
+  width: 200%; height: 200%;
+  filter: blur(70px); opacity: 0.42;
+  mix-blend-mode: screen;
+  animation: floatAurora 18s ease-in-out infinite;
+}
+.aurora::before { background: radial-gradient(ellipse at 30% 30%, var(--signal), transparent 50%); top: -50%; left: -50%; }
+.aurora::after { background: radial-gradient(ellipse at 70% 70%, var(--echo), transparent 50%); bottom: -50%; right: -50%; animation-delay: -9s; }
+@keyframes floatAurora {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(10%, 8%) scale(1.18); }
+}
+.scan-lines {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  opacity: 0.35;
+  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 3px, rgba(123,201,255,0.04) 3px, rgba(123,201,255,0.04) 4px);
+}
+.grain {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+}
+
+/* === 顶 brand === */
+.brand-row { padding: 14px 20px 6px; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 5; }
+.brand {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 17px; letter-spacing: 0.8px; font-weight: 600;
+  background: linear-gradient(135deg, var(--signal), var(--aurora-pink));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.brand-meta {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px; letter-spacing: 2.5px; color: var(--text-faint);
+  padding: 3px 8px; border: 1px solid var(--line); border-radius: 4px;
+}
+
+/* ============ 屏 1：选角页 ============ */
+.scene { position: absolute; inset: 0; display: flex; flex-direction: column; z-index: 2; }
+
+.scene-title {
+  font-family: "Noto Serif SC", "Cormorant Garamond", serif;
+  font-size: 22px; font-weight: 400;
+  color: white; text-align: center; letter-spacing: 4px;
+  margin: 14px 0 2px;
+}
+.scene-sub {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px; letter-spacing: 4px;
+  color: var(--text-faint); text-align: center; text-transform: uppercase;
+  margin-bottom: 18px;
+}
+
+.prep-list {
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 0 16px;
+  flex: 1;
+}
+.choose-card {
+  display: flex; gap: 14px;
+  padding: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(20,27,56,0.55), rgba(10,15,37,0.85));
+  border: 1.5px solid var(--line);
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  min-height: 134px;
+}
+.choose-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent 50%, rgba(255,255,255,0.04) 75%, transparent);
+  pointer-events: none;
+}
+.choose-card.A { border-color: rgba(255,107,138,0.55); box-shadow: 0 0 24px rgba(255,107,138,0.18), inset 0 0 60px rgba(255,107,138,0.06); }
+.choose-card.B { border-color: rgba(196,160,255,0.55); box-shadow: 0 0 24px rgba(196,160,255,0.18), inset 0 0 60px rgba(196,160,255,0.06); }
+.choose-card.C { border-color: rgba(123,201,255,0.55); box-shadow: 0 0 24px rgba(123,201,255,0.18), inset 0 0 60px rgba(123,201,255,0.06); }
+
+.choose-portrait {
+  width: 100px; height: 134px;
+  position: relative; overflow: hidden;
+  flex-shrink: 0;
+}
+.choose-portrait img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: contrast(1.05) saturate(1.1);
+}
+.choose-portrait::after {
+  content: ''; position: absolute; inset: 0;
+  background:
+    linear-gradient(90deg, transparent 60%, rgba(10,15,37,0.85) 100%),
+    linear-gradient(to bottom, transparent 50%, rgba(10,15,37,0.4) 100%);
+  pointer-events: none;
+}
+.choose-card.A .choose-portrait { box-shadow: inset 0 0 40px rgba(255,107,138,0.3); }
+.choose-card.B .choose-portrait { box-shadow: inset 0 0 40px rgba(196,160,255,0.3); }
+.choose-card.C .choose-portrait { box-shadow: inset 0 0 40px rgba(123,201,255,0.3); }
+.choose-info {
+  flex: 1;
+  padding: 12px 12px 11px 8px;
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  position: relative;
+  z-index: 2;
+}
+.choose-cn {
+  font-family: "Noto Serif SC", "Cormorant Garamond", serif;
+  font-size: 22px; font-weight: 500;
+  color: white;
+  letter-spacing: 3px;
+  line-height: 1;
+}
+.choose-cn .ascript {
+  display: inline-block;
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic; font-weight: 500;
+  font-size: 16px;
+  margin-left: 6px;
+  vertical-align: middle;
+  opacity: 0.55;
+}
+.choose-arch {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px; letter-spacing: 3px;
+  margin-top: 4px;
+}
+.choose-card.A .choose-arch { color: var(--char-A); }
+.choose-card.B .choose-arch { color: var(--char-B); }
+.choose-card.C .choose-arch { color: var(--char-C); }
+.choose-quote {
+  font-family: "Noto Serif SC", serif;
+  font-size: 12px; font-style: italic; font-weight: 300;
+  color: var(--text-dim);
+  line-height: 1.55;
+  letter-spacing: 0.5px;
+  margin-top: 6px;
+}
+.choose-stats {
+  display: flex; gap: 6px;
+  margin-top: 8px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 8.5px; letter-spacing: 1px;
+  color: var(--text-faint);
+  flex-wrap: wrap;
+}
+.choose-stats .stat {
+  padding: 2px 6px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: rgba(5,8,22,0.4);
+  white-space: nowrap;
+}
+.choose-stats .stat strong {
+  font-weight: 500;
+  color: var(--text);
+  margin-right: 3px;
+  letter-spacing: 0.5px;
+}
+.choose-card.A .choose-stats .stat.hl { border-color: var(--char-A); color: var(--char-A); }
+.choose-card.B .choose-stats .stat.hl { border-color: var(--char-B); color: var(--char-B); }
+.choose-card.C .choose-stats .stat.hl { border-color: var(--char-C); color: var(--char-C); }
+
+.cta-hero {
+  margin: 16px 18px 26px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(255,184,217,0.16), rgba(123,201,255,0.16) 50%, rgba(255,216,155,0.16));
+  border: 1.5px solid rgba(255,216,155,0.5);
+  position: relative;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 0 32px rgba(255,216,155,0.15), inset 0 0 40px rgba(255,184,217,0.08);
+}
+.cta-hero::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.13) 50%, transparent 70%);
+  background-size: 250% 100%;
+  animation: shimmer 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes shimmer { 0%,100% { background-position: -100% 0; } 50% { background-position: 200% 0; } }
+.cta-hero .cta-text {
+  position: relative; z-index: 2;
+}
+.cta-hero .cta-name {
+  font-family: "Noto Serif SC", serif;
+  font-size: 22px; color: white; font-weight: 500;
+  letter-spacing: 6px;
+}
+.cta-hero .cta-sub {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px; letter-spacing: 3px;
+  color: var(--resonance);
+  margin-top: 4px;
+}
+.cta-hero .cta-arrow {
+  position: relative; z-index: 2;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 28px;
+  color: var(--resonance);
+  font-style: italic;
+}
+
+/* ============ 屏 2 + 3：剧场战斗 ============ */
+.theater-bg {
+  position: absolute; inset: 0; z-index: 0;
+  overflow: hidden;
+  background: radial-gradient(ellipse at center, rgba(10,15,37,0.2), rgba(5,8,22,0.95) 80%);
+}
+.interference {
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 170px;
+  transform: translateY(-50%);
+  z-index: 5;
+  pointer-events: none;
+  opacity: 1;
+  filter: drop-shadow(0 0 4px rgba(255,216,155,0.4));
+}
+.interference svg { width: 100%; height: 100%; }
+
+.fighter-theater {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fighter-theater.enemy {
+  padding: 36px 20px 8px;
+  align-items: flex-start;
+}
+.fighter-theater.player {
+  padding: 8px 20px 188px;
+  align-items: flex-end;
+}
+
+.fighter-portrait-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 立绘玻璃罩 */
+.portrait-glass {
+  position: relative;
+  width: 74%;
+  max-width: 270px;
+  aspect-ratio: 5/4;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1.5px solid;
+  background: radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.04), rgba(5,8,22,0.4));
+  animation: breathe 4.5s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%, 100% { transform: scale(0.99); }
+  50% { transform: scale(1.012); }
+}
+.portrait-glass.enemy { border-color: var(--danger); box-shadow: 0 0 30px rgba(255,107,138,0.3), inset 0 0 60px rgba(255,107,138,0.12); }
+.portrait-glass.player { border-color: var(--signal); box-shadow: 0 0 30px rgba(123,201,255,0.3), inset 0 0 60px rgba(123,201,255,0.12); }
+
+.portrait-glass img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center 28%;
+  filter: contrast(1.08) saturate(1.05) brightness(0.95);
+}
+.portrait-glass::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    linear-gradient(to bottom, transparent 60%, rgba(5,8,22,0.55) 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+.portrait-glass::after {
+  content: ''; position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(to bottom, transparent 0, transparent 2px, rgba(123,201,255,0.025) 2px, rgba(123,201,255,0.025) 3px);
+  pointer-events: none;
+  z-index: 3;
+  mix-blend-mode: screen;
+}
+
+/* 角色身份条 */
+.identity-band {
+  position: absolute;
+  left: 13%; right: 13%;
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px; letter-spacing: 2.5px;
+  padding: 4px 10px;
+  background: rgba(5,8,22,0.75);
+  border-radius: 4px;
+  backdrop-filter: blur(8px);
+  z-index: 4;
+  white-space: nowrap;
+}
+.fighter-theater.enemy .identity-band {
+  top: 16px;
+  color: var(--danger);
+  border-left: 2px solid var(--danger);
+}
+.fighter-theater.player .identity-band {
+  bottom: 168px;
+  color: var(--signal);
+  border-left: 2px solid var(--signal);
+}
+.identity-band .role-tag {
+  opacity: 0.5;
+  font-size: 8px;
+  letter-spacing: 3px;
+}
+.identity-band .role-name {
+  font-family: "Noto Serif SC", "Cormorant Garamond", serif;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  color: white;
+}
+
+/* HP 凹刻雕版 */
+.hp-engraved {
+  position: absolute;
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 600;
+  font-size: 52px;
+  line-height: 0.9;
+  letter-spacing: -1px;
+  z-index: 5;
+  text-shadow:
+    0 1px 0 rgba(0,0,0,0.7),
+    0 -1px 1px rgba(255,255,255,0.08);
+  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.6));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 14px currentColor);
+}
+.fighter-theater.enemy .hp-engraved {
+  top: 44px; right: 18%;
+  color: var(--danger);
+}
+.fighter-theater.player .hp-engraved {
+  bottom: 200px; left: 18%;
+  color: var(--signal);
+}
+.hp-engraved .hp-max {
+  display: inline-block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  opacity: 0.55;
+  vertical-align: middle;
+  margin-left: 4px;
+  -webkit-text-fill-color: var(--text-dim);
+  font-weight: 400;
+}
+.hp-engraved .hp-label {
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 8px;
+  letter-spacing: 4px;
+  opacity: 0.6;
+  margin-bottom: 2px;
+  font-weight: 400;
+  -webkit-text-fill-color: currentColor;
+}
+
+/* 蓄能光柱（侧边） */
+.charge-rail {
+  position: absolute;
+  width: 4px;
+  border-radius: 2px;
+  background: rgba(255,216,155,0.08);
+  z-index: 4;
+  overflow: hidden;
+}
+.charge-rail .charge-fill {
+  position: absolute;
+  left: 0; right: 0;
+  background: linear-gradient(to top, var(--charge), rgba(255,216,155,0.5));
+  box-shadow: 0 0 10px var(--charge), 0 0 24px rgba(255,216,155,0.5);
+  border-radius: 2px;
+  transition: height 0.6s;
+}
+.fighter-theater.enemy .charge-rail {
+  top: 48px; right: 8%; height: 100px;
+}
+.fighter-theater.enemy .charge-rail .charge-fill {
+  top: 0;
+}
+.fighter-theater.player .charge-rail {
+  bottom: 208px; left: 8%; height: 100px;
+}
+.fighter-theater.player .charge-rail .charge-fill {
+  bottom: 0;
+}
+.charge-rail-num {
+  position: absolute;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--charge);
+  text-shadow: 0 0 8px var(--charge);
+  z-index: 5;
+  letter-spacing: 1px;
+}
+.fighter-theater.enemy .charge-rail-num { top: 32px; right: 5%; }
+.fighter-theater.player .charge-rail-num { bottom: 314px; left: 5%; }
+.charge-rail-num.peak {
+  color: var(--power);
+  text-shadow: 0 0 12px var(--power);
+}
+
+/* 能量圆点 */
+.energy-dots {
+  position: absolute;
+  display: flex; gap: 6px;
+  z-index: 4;
+}
+.fighter-theater.enemy .energy-dots {
+  top: 60px; left: 18%;
+}
+.fighter-theater.player .energy-dots {
+  bottom: 220px; right: 18%;
+}
+.energy-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid;
+  position: relative;
+}
+.energy-dot.active {
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor, 0 0 16px currentColor;
+}
+.fighter-theater.enemy .energy-dot { border-color: var(--danger); color: var(--danger); }
+.fighter-theater.player .energy-dot { border-color: var(--signal); color: var(--signal); }
+.energy-dot.inactive { opacity: 0.25; }
+
+/* combo / cstreak badge */
+.tactical-badge {
+  position: absolute;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px; letter-spacing: 1.5px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  z-index: 5;
+  background: rgba(5,8,22,0.7);
+  backdrop-filter: blur(6px);
+}
+.tactical-badge.combo { color: var(--attack); border: 1px solid rgba(255,138,92,0.5); }
+.tactical-badge.streak { color: var(--chargec); border: 1px solid rgba(107,227,160,0.5); }
+.fighter-theater.player .tactical-badge { bottom: 195px; right: 18%; }
+.fighter-theater.enemy .tactical-badge { top: 36px; left: 18%; }
+
+/* 中间博弈区 */
+.arena-center {
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  transform: translateY(-50%);
+  text-align: center;
+  z-index: 6;
+  pointer-events: none;
+}
+.round-tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px; letter-spacing: 4px;
+  color: var(--text-faint);
+  margin-bottom: 4px;
+}
+.battle-msg {
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic; font-weight: 400;
+  font-size: 14px;
+  color: var(--resonance);
+  letter-spacing: 4px;
+  line-height: 1.4;
+  text-shadow: 0 0 14px rgba(255,216,155,0.6), 0 2px 6px rgba(0,0,0,0.6);
+}
+.battle-msg-cn {
+  font-family: "Noto Serif SC", serif;
+  font-style: normal; font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 7px;
+  color: rgba(255,255,255,0.92);
+  display: block;
+  margin-top: 4px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.7), 0 0 12px rgba(255,216,155,0.25);
+}
+
+/* 底部 6 动作按钮（保留风格） */
+.actions-tray {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 12px 14px 16px;
+  background: linear-gradient(to top, rgba(5,8,22,0.95), rgba(5,8,22,0.6) 80%, transparent);
+  z-index: 6;
+  border-top: 1px solid rgba(155,161,199,0.08);
+  backdrop-filter: blur(12px);
+}
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+.act-btn {
+  display: flex; flex-direction: column;
+  align-items: center;
+  padding: 4px 2px 0;
+  background: transparent; border: none;
+  cursor: pointer;
+  color: currentColor;
+  position: relative;
+}
+.act-btn.attack { color: var(--attack); }
+.act-btn.power  { color: var(--power); }
+.act-btn.block  { color: var(--block); }
+.act-btn.guard  { color: var(--guard); }
+.act-btn.charge { color: var(--chargec); }
+.act-btn.break  { color: var(--breakc); }
+.act-btn .ring {
+  position: relative;
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(8,12,28,0.55);
+  border: 1.5px solid currentColor;
+  box-shadow: 0 0 12px -3px currentColor, inset 0 0 12px -5px currentColor;
+}
+.act-btn .ring::before {
+  content: ''; position: absolute; inset: -4px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  opacity: 0.22;
+}
+.act-btn.selected .ring {
+  border-width: 2px;
+  box-shadow: 0 0 28px -1px currentColor, 0 0 48px -10px currentColor, inset 0 0 18px -4px currentColor;
+}
+.act-btn.selected .ring::before { opacity: 0.7; inset: -7px; }
+.act-btn .sym {
+  width: 22px; height: 22px;
+  color: currentColor;
+  filter: drop-shadow(0 0 4px currentColor);
+}
+.act-btn .sym svg { display: block; width: 100%; height: 100%; }
+.act-btn .name {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 8px; letter-spacing: 1.5px;
+  margin-top: 5px;
+  color: currentColor;
+  text-shadow: 0 0 3px currentColor;
+}
+.commit-btn {
+  margin-top: 8px;
+  padding: 9px;
+  background: linear-gradient(135deg, rgba(255,216,155,0.28), rgba(255,184,217,0.22));
+  border: 1px solid var(--resonance);
+  border-radius: 12px;
+  color: white;
+  font-family: "Noto Serif SC", "Cormorant Garamond", serif;
+  font-size: 15px;
+  letter-spacing: 6px;
+  text-align: center;
+  cursor: pointer;
+  font-weight: 500;
+  width: 100%;
+  display: block;
+  box-shadow: 0 0 16px rgba(255,216,155,0.25);
+}
+
+/* ============ 屏 3: BURST 特写 ============ */
+.burst-stage {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background:
+    radial-gradient(ellipse at center, rgba(255,210,74,0.5), rgba(0,0,0,0.9) 70%);
+  z-index: 10;
+  overflow: hidden;
+}
+.burst-stage .portrait-fill {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center 30%;
+  filter: contrast(1.2) saturate(0.5) brightness(0.45);
+  z-index: 1;
+}
+.burst-stage .portrait-fill::after {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.65) 60%, rgba(0,0,0,0.9)),
+    linear-gradient(135deg, rgba(255,210,74,0.2), rgba(255,184,217,0.15) 50%, transparent);
+  mix-blend-mode: multiply;
+}
+.burst-ripples {
+  position: absolute; inset: 0;
+  z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+}
+.burst-ripples .ripple {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid var(--power);
+  opacity: 0.3;
+}
+.burst-ripples .ripple:nth-child(1) { width: 260px; height: 260px; box-shadow: 0 0 40px var(--power); }
+.burst-ripples .ripple:nth-child(2) { width: 360px; height: 360px; opacity: 0.18; }
+.burst-ripples .ripple:nth-child(3) { width: 480px; height: 480px; opacity: 0.1; }
+
+.burst-text {
+  position: relative; z-index: 4;
+  text-align: center;
+}
+.burst-text .main {
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic; font-weight: 600;
+  font-size: 82px;
+  letter-spacing: 12px;
+  line-height: 0.9;
+  color: var(--power);
+  text-shadow: 0 0 30px rgba(255,210,74,0.8), 0 0 60px rgba(255,210,74,0.4);
+}
+.burst-text .cn {
+  font-family: "Noto Serif SC", serif;
+  font-size: 16px; font-weight: 300;
+  letter-spacing: 12px;
+  color: rgba(255,255,255,0.85);
+  margin-top: 12px;
+  text-shadow: 0 0 12px rgba(255,216,155,0.3);
+}
+.burst-text .spec {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px; letter-spacing: 4px;
+  color: var(--resonance);
+  margin-top: 22px;
+  opacity: 0.75;
+}
+.burst-vignette-cracks {
+  position: absolute; inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0.4;
+}
+.burst-meta-overlay {
+  position: absolute;
+  top: 20px; left: 20px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px; letter-spacing: 3px;
+  color: var(--text-faint);
+  z-index: 5;
+}
+.burst-meta-overlay .row { margin-bottom: 2px; }
+.burst-meta-overlay strong { color: var(--power); margin-right: 6px; font-weight: 500; }
+
+/* ============ 共享：粒子 ============ */
+.particles { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.particle {
+  position: absolute; bottom: 0;
+  width: 2px; height: 2px;
+  background: var(--signal); border-radius: 50%;
+  box-shadow: 0 0 6px var(--signal);
+  animation: floatUp 9s linear infinite; opacity: 0;
+}
+@keyframes floatUp {
+  0% { opacity: 0; transform: translateY(0) translateX(0); }
+  20% { opacity: 0.7; }
+  80% { opacity: 0.7; }
+  100% { opacity: 0; transform: translateY(-100vh) translateX(20px); }
+}
+
+</style>
+</head>
+<body>
+
+<div class="gallery-header">
+  <h1>Memoria · 方向 A · 频率剧场</h1>
+  <div class="subtitle">cosplay portrait theater · aurora · frequency interference · v0.1 mockup</div>
+</div>
+
+<div class="gallery">
+
+  <!-- ============ 屏 1：选角页 ============ -->
+  <div class="screen-frame">
+    <span class="screen-label"><span class="num">01</span>选角 · Choose Memoria</span>
+    <div class="phone-shell">
+      <div class="aurora"></div>
+      <div class="scan-lines"></div>
+      <div class="grain"></div>
+
+      <div class="scene">
+        <div class="brand-row">
+          <div class="brand">Memoria · 共鸣对决</div>
+          <div class="brand-meta">v 3.10</div>
+        </div>
+
+        <div class="scene-title">选 一 位 Memoria</div>
+        <div class="scene-sub">Choose · One · Keeper</div>
+
+        <div class="prep-list">
+
+          <!-- A 朱 -->
+          <div class="choose-card A">
+            <div class="choose-portrait">
+              <img src="../img/明日香战斗服/1.jpg" alt="朱">
+            </div>
+            <div class="choose-info">
+              <div>
+                <div class="choose-cn">朱<span class="ascript">Vermillion / A</span></div>
+                <div class="choose-arch">强 袭 · ASSAULT</div>
+                <div class="choose-quote">"她在废墟里追猎频率——<br/>不留余地，先发制人。"</div>
+              </div>
+              <div class="choose-stats">
+                <span class="stat hl"><strong>ATK</strong>3</span>
+                <span class="stat"><strong>连击</strong>3/4/5</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- B 阿尔贝 -->
+          <div class="choose-card B">
+            <div class="choose-portrait">
+              <img src="../img/雅儿贝德/DSC02143.jpg" alt="阿尔贝">
+            </div>
+            <div class="choose-info">
+              <div>
+                <div class="choose-cn">阿尔贝<span class="ascript">Albedo / B</span></div>
+                <div class="choose-arch">格 挡 · REFLECT</div>
+                <div class="choose-quote">"她翅膀拢起所有反响——<br/>你打她，是在打自己。"</div>
+              </div>
+              <div class="choose-stats">
+                <span class="stat hl"><strong>反伤</strong>×2</span>
+                <span class="stat"><strong>凝固</strong>反震 +蓄/3</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- C 雪 -->
+          <div class="choose-card C">
+            <div class="choose-portrait">
+              <img src="../img/花园白雪之仪/1.jpg" alt="雪">
+            </div>
+            <div class="choose-info">
+              <div>
+                <div class="choose-cn">雪<span class="ascript">Snow Rite / C</span></div>
+                <div class="choose-arch">蓄 势 · OVERFLOW</div>
+                <div class="choose-quote">"她从光中聚拢爆响——<br/>一击之内，所有静默归零。"</div>
+              </div>
+              <div class="choose-stats">
+                <span class="stat hl"><strong>聚频</strong>2/4/7/11</span>
+                <span class="stat"><strong>穿透</strong>≥5</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="cta-hero">
+          <div class="cta-text">
+            <div class="cta-name">进 入 共 鸣</div>
+            <div class="cta-sub">START · ENTER RESONANCE</div>
+          </div>
+          <div class="cta-arrow">→</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 屏 2：战斗中 idle ============ -->
+  <div class="screen-frame">
+    <span class="screen-label"><span class="num">02</span>战斗 idle · 频率剧场</span>
+    <div class="phone-shell">
+      <div class="aurora"></div>
+      <div class="scan-lines"></div>
+      <div class="grain"></div>
+
+      <!-- 粒子 -->
+      <div class="particles">
+        <div class="particle" style="left: 10%; animation-delay: -1s;"></div>
+        <div class="particle" style="left: 30%; animation-delay: -3s; background: var(--echo); box-shadow: 0 0 6px var(--echo);"></div>
+        <div class="particle" style="left: 55%; animation-delay: -5s;"></div>
+        <div class="particle" style="left: 75%; animation-delay: -2s; background: var(--charge); box-shadow: 0 0 6px var(--charge);"></div>
+        <div class="particle" style="left: 88%; animation-delay: -7s;"></div>
+      </div>
+
+      <div class="scene">
+        <div class="brand-row">
+          <div class="brand">Memoria · 共鸣对决</div>
+          <div class="brand-meta">第 7 回合</div>
+        </div>
+
+        <!-- 敌方剧场 -->
+        <div class="fighter-theater enemy">
+          <div class="identity-band">
+            <span class="role-tag">STATIC</span>
+            <span class="role-name">阿 尔 贝</span>
+            <span class="role-tag">B · REFLECT</span>
+          </div>
+          <div class="fighter-portrait-wrap">
+            <div class="portrait-glass enemy">
+              <img src="../img/雅儿贝德/DSC02143.jpg" alt="Static">
+            </div>
+          </div>
+          <div class="energy-dots">
+            <div class="energy-dot active"></div>
+            <div class="energy-dot active"></div>
+            <div class="energy-dot inactive"></div>
+          </div>
+          <div class="charge-rail">
+            <div class="charge-fill" style="height: 30%;"></div>
+          </div>
+          <div class="charge-rail-num">3</div>
+          <div class="hp-engraved">
+            <span class="hp-label">BEAT</span>
+            12<span class="hp-max">/15</span>
+          </div>
+        </div>
+
+        <!-- 中间博弈 + 频率干涉带 -->
+        <div class="interference">
+          <svg viewBox="0 0 420 170" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="freqA" x1="0" x2="1">
+                <stop offset="0" stop-color="#7BC9FF" stop-opacity="0.15"/>
+                <stop offset="0.5" stop-color="#7BC9FF" stop-opacity="1"/>
+                <stop offset="1" stop-color="#7BC9FF" stop-opacity="0.15"/>
+              </linearGradient>
+              <linearGradient id="freqB" x1="0" x2="1">
+                <stop offset="0" stop-color="#C4A0FF" stop-opacity="0.15"/>
+                <stop offset="0.5" stop-color="#C4A0FF" stop-opacity="1"/>
+                <stop offset="1" stop-color="#C4A0FF" stop-opacity="0.15"/>
+              </linearGradient>
+            </defs>
+            <!-- 上半层 sine (Static · 紫) -->
+            <path d="M 0 50 Q 35 20, 70 50 T 140 50 T 210 50 T 280 50 T 350 50 T 420 50"
+                  fill="none" stroke="url(#freqB)" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M 0 62 Q 35 32, 70 62 T 140 62 T 210 62 T 280 62 T 350 62 T 420 62"
+                  fill="none" stroke="url(#freqB)" stroke-width="1.4" opacity="0.55" stroke-linecap="round"/>
+            <path d="M 0 72 Q 35 42, 70 72 T 140 72 T 210 72 T 280 72 T 350 72 T 420 72"
+                  fill="none" stroke="url(#freqB)" stroke-width="1" opacity="0.3" stroke-linecap="round"/>
+            <!-- 下半层 sine (Player · 青) -->
+            <path d="M 0 120 Q 50 90, 100 120 T 200 120 T 300 120 T 420 120"
+                  fill="none" stroke="url(#freqA)" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M 0 108 Q 50 78, 100 108 T 200 108 T 300 108 T 420 108"
+                  fill="none" stroke="url(#freqA)" stroke-width="1.4" opacity="0.55" stroke-linecap="round"/>
+            <path d="M 0 98 Q 50 68, 100 98 T 200 98 T 300 98 T 420 98"
+                  fill="none" stroke="url(#freqA)" stroke-width="1" opacity="0.3" stroke-linecap="round"/>
+            <!-- 中线（金色虚线） -->
+            <line x1="20" y1="85" x2="400" y2="85" stroke="#FFD89B" stroke-opacity="0.45" stroke-width="0.8" stroke-dasharray="4 8"/>
+            <!-- 干涉点 -->
+            <circle cx="105" cy="85" r="3.5" fill="#FFD89B" opacity="0.7"/>
+            <circle cx="210" cy="85" r="5" fill="#FFD89B" opacity="0.9"/>
+            <circle cx="315" cy="85" r="3" fill="#FFD89B" opacity="0.6"/>
+          </svg>
+        </div>
+        <div class="arena-center">
+          <div class="round-tag">ROUND · 07</div>
+          <div class="battle-msg">
+            <em>select your frequency</em>
+            <span class="battle-msg-cn">选 你 的 频 率 · 同 时 回 响</span>
+          </div>
+        </div>
+
+        <!-- 玩家方剧场 -->
+        <div class="fighter-theater player">
+          <div class="fighter-portrait-wrap">
+            <div class="portrait-glass player">
+              <img src="../img/花园白雪之仪/1.jpg" alt="Player">
+            </div>
+          </div>
+          <div class="identity-band">
+            <span class="role-tag">YOU</span>
+            <span class="role-name">雪</span>
+            <span class="role-tag">C · OVERFLOW</span>
+          </div>
+          <div class="energy-dots">
+            <div class="energy-dot active"></div>
+            <div class="energy-dot active"></div>
+            <div class="energy-dot active"></div>
+          </div>
+          <div class="charge-rail">
+            <div class="charge-fill" style="height: 60%;"></div>
+          </div>
+          <div class="charge-rail-num peak">6</div>
+          <div class="tactical-badge streak">连蓄 ×3</div>
+          <div class="hp-engraved">
+            <span class="hp-label">BEAT</span>
+            14<span class="hp-max">/15</span>
+          </div>
+        </div>
+
+        <div class="actions-tray">
+          <div class="actions-grid">
+            <button class="act-btn attack">
+              <div class="ring">
+                <div class="sym"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M 18 50 L 72 50"/><path d="M 56 32 L 84 50 L 56 68"/></svg></div>
+              </div>
+              <div class="name">触达</div>
+            </button>
+            <button class="act-btn power selected">
+              <div class="ring">
+                <div class="sym"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="50" r="9" fill="currentColor" stroke="none"/><line x1="50" y1="12" x2="50" y2="28"/><line x1="50" y1="72" x2="50" y2="88"/><line x1="12" y1="50" x2="28" y2="50"/><line x1="72" y1="50" x2="88" y2="50"/><line x1="24" y1="24" x2="34" y2="34"/><line x1="66" y1="66" x2="76" y2="76"/><line x1="76" y1="24" x2="66" y2="34"/><line x1="34" y1="66" x2="24" y2="76"/></svg></div>
+              </div>
+              <div class="name">爆响</div>
+            </button>
+            <button class="act-btn block">
+              <div class="ring">
+                <div class="sym"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="50" r="34"/><circle cx="50" cy="50" r="18" stroke-width="3"/></svg></div>
+              </div>
+              <div class="name">守护</div>
+            </button>
+            <button class="act-btn guard">
+              <div class="ring">
+                <div class="sym"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><polygon points="50,12 84,30 84,70 50,88 16,70 16,30"/><polygon points="50,32 66,42 66,58 50,68 34,58 34,42" stroke-width="3"/></svg></div>
+              </div>
+              <div class="name">凝固</div>
+            </button>
+            <button class="act-btn charge">
+              <div class="ring">
+                <div class="sym"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M 18 78 Q 32 78, 38 60 T 56 38 T 80 18"/><path d="M 70 18 L 84 18 L 84 32"/></svg></div>
+              </div>
+              <div class="name">聚频</div>
+            </button>
+            <button class="act-btn break">
+              <div class="ring">
+                <div class="sym"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="22" x2="78" y2="78"/><line x1="78" y1="22" x2="22" y2="78"/><circle cx="50" cy="50" r="5" fill="currentColor" stroke="none"/></svg></div>
+              </div>
+              <div class="name">散频</div>
+            </button>
+          </div>
+          <button class="commit-btn">爆 响 · 消 耗 6 点</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 屏 3：BURST 特写 ============ -->
+  <div class="screen-frame">
+    <span class="screen-label"><span class="num">03</span>BURST 特写</span>
+    <div class="phone-shell">
+      <div class="aurora"></div>
+      <div class="scan-lines"></div>
+
+      <!-- 全屏 portrait fill -->
+      <div class="burst-stage">
+        <div class="portrait-fill" style="background-image: url(../img/花园白雪之仪/1.jpg);"></div>
+        <div class="burst-ripples">
+          <div class="ripple"></div>
+          <div class="ripple"></div>
+          <div class="ripple"></div>
+        </div>
+        <div class="burst-vignette-cracks">
+          <svg viewBox="0 0 420 860" width="100%" height="100%" preserveAspectRatio="none">
+            <g stroke="rgba(255,210,74,0.5)" stroke-width="0.5" fill="none">
+              <path d="M 0 200 L 180 400 L 0 600"/>
+              <path d="M 420 240 L 240 430 L 420 580"/>
+              <path d="M 0 80 L 100 200"/>
+              <path d="M 420 100 L 340 220"/>
+              <path d="M 80 760 L 200 600"/>
+              <path d="M 340 770 L 240 620"/>
+            </g>
+          </svg>
+        </div>
+        <div class="burst-meta-overlay">
+          <div class="row"><strong>BURST</strong>POWER 6 / SPENT</div>
+          <div class="row"><strong>BY</strong>YOU · 雪</div>
+        </div>
+        <div class="burst-text">
+          <div class="main">BURST</div>
+          <div class="cn">频 率 · 爆 响</div>
+          <div class="spec">— DMG 7 PENETRATE —</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div style="padding: 24px 48px 64px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(155,161,199,0.5); letter-spacing: 1.5px; line-height: 1.8;">
+  <strong style="color: rgba(255,216,155,0.8); font-weight: 500; letter-spacing: 3px;">DESIGN NOTES · v0.1</strong><br/>
+  · 立绘统一用 cosplay 真照（明日香战斗服 / 雅儿贝德 / 花园白雪之仪）<br/>
+  · 选角文案改为「中文单字命名 + ASCII 副名 + 一句诗 + 真正影响玩法的 stat」——丢掉数据表叙事<br/>
+  · 战斗剧场：双方半身像在玻璃罩里隔频率干涉带对望，HP 用衬线大字凹刻在角落（不再溢出卡外）<br/>
+  · 频率干涉带 = 双方 sine 波相干涉 + 干涉峰用金点标记 —— 这是 spec.md 第 316 行说的「波干涉图」<br/>
+  · 信息一等公民只留 3 个：HP 数字 / 蓄能光柱 / 能量圆点。其它（combo/连蓄/极光/扫描/粒子）全部降级到二等<br/>
+  · BURST 特写：角色立绘做底（高对比低饱和暗化），加放射状裂纹 + 同心圆涟漪 + 衬线 BURST 大字
+</div>
+
+</body>
+</html>

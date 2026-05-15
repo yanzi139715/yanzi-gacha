@@ -1,242 +1,224 @@
-// 抽卡引擎 - 多池版本
+// ============================================================
+// Memoria Network · 抽卡引擎（per coser 数据隔离）
+// ============================================================
 const GachaEngine = {
-  // 获取卡池的保底计数key
   pityKey(poolId) {
-    return `pity_${poolId}`;
+    // 简化：所有池统一用 pool.id 作 pity key
+    return `pity_${poolId.replace(/-/g, '_')}`;
   },
 
-  // 获取卡池保底计数
   getPity(poolId) {
+    const pool = POOLS[poolId];
+    if (!pool) return 0;
     const state = GameState.get();
-    return state[this.pityKey(poolId)] || 0;
+    const cdata = state.coserData[pool.coserId];
+    return cdata?.[this.pityKey(poolId)] || 0;
   },
 
-  // 设置卡池保底计数
   setPity(poolId, count) {
-    const state = GameState.get();
-    state[this.pityKey(poolId)] = count;
-    GameState.save(state);
+    const pool = POOLS[poolId];
+    if (!pool) return;
+    GameState.updateCoserData(pool.coserId, d => ({ ...d, [this.pityKey(poolId)]: count }));
   },
 
-  // 从指定卡池抽取一张卡
+  // 单抽一张
   pull(poolId) {
-    const pool = POOL_CONFIG[poolId];
+    const pool = POOLS[poolId];
     if (!pool) return null;
-
     const state = GameState.get();
-    const pityKey = this.pityKey(poolId);
-    const pityCount = state[pityKey] || 0;
+    const cdata = state.coserData[pool.coserId];
+    const pityCount = cdata[this.pityKey(poolId)] || 0;
 
-    // 计算SSR概率（含软保底）
     let ssrProb = RARITY_CONFIG.SSR.prob;
     if (pityCount >= pool.softPityStart) {
       ssrProb += (pityCount - pool.softPityStart + 1) * pool.softPityRate;
     }
+    if (pityCount + 1 >= pool.pityLimit) ssrProb = 100; // 硬保底
 
     const rand = Math.random() * 100;
-    let rarity;
+    const rarity = rand < ssrProb ? 'SSR'
+      : rand < ssrProb + RARITY_CONFIG.SR.prob ? 'SR' : 'R';
 
-    if (rand < ssrProb) {
-      rarity = 'SSR';
-    } else if (rand < ssrProb + RARITY_CONFIG.SR.prob) {
-      rarity = 'SR';
-    } else {
-      rarity = 'R';
-    }
-
-    // 选择卡牌
     let card;
-    const hasRateUp = pool.rateUpCharId && pool.rateUpFraction > 0;
-
-    if (hasRateUp) {
-      // 有UP角色的卡池：按概率决定是否出UP角色
-      const upRoll = Math.random();
-      if (upRoll < pool.rateUpFraction) {
-        // 出UP角色的该稀有度卡牌
-        const upChar = getCharacterById(pool.rateUpCharId);
-        const upCards = upChar.images
-          .map((img, idx) => ({
-            characterId: upChar.id,
-            characterName: upChar.name,
-            description: upChar.description,
-            imageIndex: idx,
-            src: img.src,
-            rarity: img.rarity,
-            uid: `${upChar.id}_${idx}`
-          }))
-          .filter(c => c.rarity === rarity);
-
-        if (upCards.length > 0) {
-          card = upCards[Math.floor(Math.random() * upCards.length)];
-        }
-      }
+    if (pool.rateUpCharId && pool.rateUpFraction > 0 && Math.random() < pool.rateUpFraction) {
+      const upChar = getCharacterById(pool.rateUpCharId);
+      const ups = upChar.images.map((img, idx) => ({
+        uid: `${upChar.id}_${idx}`, characterId: upChar.id, characterName: upChar.name,
+        coserId: upChar.coserId, description: upChar.description, imageIndex: idx,
+        src: img.src, rarity: img.rarity
+      })).filter(c => c.rarity === rarity);
+      if (ups.length > 0) card = ups[Math.floor(Math.random() * ups.length)];
     }
-
-    // 非UP或UP角色没有该稀有度的卡，从整个卡池该稀有度中选
     if (!card) {
-      const poolCards = getCardsByRarityInPool(rarity, poolId);
-      if (poolCards.length > 0) {
-        card = poolCards[Math.floor(Math.random() * poolCards.length)];
-      } else {
-        // fallback: 从整个卡池随机选（不应发生）
-        const allPoolCards = getCardsByRarityInPool('R', poolId);
-        card = allPoolCards[Math.floor(Math.random() * allPoolCards.length)];
+      const pcards = getCardsByRarityInPool(rarity, poolId);
+      if (pcards.length > 0) card = pcards[Math.floor(Math.random() * pcards.length)];
+      else {
+        const fallback = getCardsByRarityInPool('R', poolId);
+        card = fallback[Math.floor(Math.random() * fallback.length)];
       }
     }
 
-    // 检查是否重复
-    const isDuplicate = state.collection.includes(card.uid);
+    // 更新 coser data
+    const isDup = cdata.collection.includes(card.uid);
+    let echoShardGain = 0;
+    let unlockLevelUp = null;
 
-    // 更新状态
-    if (!isDuplicate) {
-      state.collection.push(card.uid);
+    const newData = { ...cdata };
+    newData.collection = [...cdata.collection];
+    newData.skinUnlocks = { ...cdata.skinUnlocks };
+
+    if (!isDup) {
+      newData.collection.push(card.uid);
+      if (rarity === 'SSR') {
+        newData.skinUnlocks[card.uid] = { pulls: 1, level: 1 };
+      }
     } else {
-      state.coins += RARITY_CONFIG[rarity].coinValue;
+      if (rarity === 'SSR') {
+        const entry = newData.skinUnlocks[card.uid] || { pulls: 1, level: 1 };
+        const prev = entry.level;
+        entry.pulls = (entry.pulls || 1) + 1;
+        entry.level = Math.min(5, entry.level + 1);
+        newData.skinUnlocks[card.uid] = entry;
+        if (entry.level > prev) unlockLevelUp = { from: prev, to: entry.level };
+        echoShardGain = RARITY_CONFIG.SSR.shardValue;
+        newData.fragment = (newData.fragment || 0) + echoShardGain;
+      } else {
+        newData.beacon = (newData.beacon || 0) + RARITY_CONFIG[rarity].coinValue;
+      }
     }
 
-    // 更新保底计数
-    if (rarity === 'SSR') {
-      state[pityKey] = 0;
-    } else {
-      state[pityKey] = (state[pityKey] || 0) + 1;
-    }
+    // 保底计数
+    newData[this.pityKey(poolId)] = rarity === 'SSR' ? 0 : (cdata[this.pityKey(poolId)] || 0) + 1;
 
-    state.totalPulls++;
-    GameState.save(state);
+    GameState.updateCoserData(pool.coserId, () => newData);
+    const s2 = GameState.get();
+    s2.totalPulls++;
+    s2.pullHistory = (s2.pullHistory || []).concat([{
+      uid: card.uid,
+      charId: card.characterId,
+      charName: card.characterName,
+      rarity: card.rarity,
+      at: Date.now(),
+      poolId,
+      coserId: pool.coserId
+    }]).slice(-100);
+    GameState.save(s2);
 
     return {
       uid: card.uid,
       characterId: card.characterId,
       characterName: card.characterName,
+      coserId: card.coserId,
       description: card.description,
       image: card.src,
       rarity: card.rarity,
       imageIndex: card.imageIndex,
-      isDuplicate,
-      coinValue: isDuplicate ? RARITY_CONFIG[rarity].coinValue : 0
+      isDuplicate: isDup,
+      coinValue: isDup && rarity !== 'SSR' ? RARITY_CONFIG[rarity].coinValue : 0,
+      echoShardGain,
+      unlockLevelUp,
+      currentLevel: newData.skinUnlocks[card.uid]?.level || null
     };
   },
 
   // 单抽
   singlePull(poolId) {
-    const pool = POOL_CONFIG[poolId];
+    const pool = POOLS[poolId];
     if (!pool) return { success: false, reason: '卡池不存在' };
+    const cdata = GameState.get().coserData[pool.coserId];
 
-    const state = GameState.get();
-    const ticketKey = `ticket_${poolId}`;
-    const hasTicket = (state[ticketKey] || 0) > 0;
-    const hasUniversalTicket = (state.tickets || 0) > 0;
-
-    if (!hasTicket && !hasUniversalTicket && state.coins < 10) {
-      return { success: false, reason: '没有抽卡券，金币也不够（需要10金币）' };
-    }
-
-    // 优先使用卡池专属券，再用通用券，最后用金币
-    if (hasTicket) {
-      state[ticketKey]--;
-    } else if (hasUniversalTicket) {
-      state.tickets--;
+    if ((cdata.tickets || 0) > 0) {
+      GameState.updateCoserData(pool.coserId, d => ({ ...d, tickets: d.tickets - 1 }));
+    } else if ((cdata.beacon || 0) >= 10) {
+      GameState.updateCoserData(pool.coserId, d => ({ ...d, beacon: d.beacon - 10 }));
     } else {
-      state.coins -= 10;
+      return { success: false, reason: `${COSERS[pool.coserId].name} 的抽卡券与 Beacon 都不足（需 1 券或 10 Beacon）` };
     }
-    GameState.save(state);
-
     return { success: true, cards: [this.pull(poolId)], poolId };
   },
 
-  // 十连抽（保底至少1张SR）
+  // 十连
   tenPull(poolId) {
-    const pool = POOL_CONFIG[poolId];
+    const pool = POOLS[poolId];
     if (!pool) return { success: false, reason: '卡池不存在' };
-
-    const state = GameState.get();
-    const cost = 10;
-    const ticketKey = `ticket_${poolId}`;
-    const poolTickets = state[ticketKey] || 0;
-    const universalTickets = state.tickets || 0;
-
-    // 计算券的使用
-    let usePoolTickets = Math.min(poolTickets, cost);
-    let remain = cost - usePoolTickets;
-    let useUniversal = Math.min(universalTickets, remain);
-    remain -= useUniversal;
-    let useCoins = remain * 10;
-
-    if (state.coins < useCoins) {
-      return { success: false, reason: '抽卡券或金币不足（需要10张券或100金币）' };
+    const cdata = GameState.get().coserData[pool.coserId];
+    const ticketsHave = cdata.tickets || 0;
+    const useTickets = Math.min(ticketsHave, 10);
+    const beaconNeed = (10 - useTickets) * 10;
+    if ((cdata.beacon || 0) < beaconNeed) {
+      return { success: false, reason: `${COSERS[pool.coserId].name} 的资源不足（需 10 券 或 100 Beacon）` };
     }
 
-    state[ticketKey] = poolTickets - usePoolTickets;
-    state.tickets = universalTickets - useUniversal;
-    state.coins -= useCoins;
-    GameState.save(state);
+    GameState.updateCoserData(pool.coserId, d => ({
+      ...d,
+      tickets: d.tickets - useTickets,
+      beacon: d.beacon - beaconNeed
+    }));
 
     const cards = [];
     let hasSR = false;
-
     for (let i = 0; i < 10; i++) {
-      const card = this.pull(poolId);
-      cards.push(card);
-      if (card.rarity === 'SR' || card.rarity === 'SSR') hasSR = true;
+      const c = this.pull(poolId);
+      cards.push(c);
+      if (c.rarity === 'SR' || c.rarity === 'SSR') hasSR = true;
     }
-
-    // 保底SR
+    // SR 保底
     if (!hasSR) {
-      const srPool = getCardsByRarityInPool('SR', poolId);
-      if (srPool.length > 0) {
-        const guaranteed = srPool[Math.floor(Math.random() * srPool.length)];
-        const isDuplicate = state.collection.includes(guaranteed.uid);
-
-        if (!isDuplicate) {
-          state.collection.push(guaranteed.uid);
-        } else {
-          state.coins += RARITY_CONFIG.SR.coinValue;
-        }
-        GameState.save(state);
-
+      const srs = getCardsByRarityInPool('SR', poolId);
+      if (srs.length > 0) {
+        const g = srs[Math.floor(Math.random() * srs.length)];
+        const cur = GameState.get();
+        const curC = cur.coserData[pool.coserId];
+        const isDup = curC.collection.includes(g.uid);
+        const newD = { ...curC, collection: [...curC.collection] };
+        if (!isDup) newD.collection.push(g.uid);
+        else newD.beacon = (newD.beacon || 0) + RARITY_CONFIG.SR.coinValue;
+        GameState.updateCoserData(pool.coserId, () => newD);
         cards[9] = {
-          uid: guaranteed.uid,
-          characterId: guaranteed.characterId,
-          characterName: guaranteed.characterName,
-          description: guaranteed.description,
-          image: guaranteed.src,
-          rarity: 'SR',
-          imageIndex: guaranteed.imageIndex,
-          isDuplicate,
-          coinValue: isDuplicate ? RARITY_CONFIG.SR.coinValue : 0
+          uid: g.uid, characterId: g.characterId, characterName: g.characterName,
+          coserId: g.coserId, description: g.description, image: g.src,
+          rarity: 'SR', imageIndex: g.imageIndex,
+          isDuplicate: isDup, coinValue: isDup ? RARITY_CONFIG.SR.coinValue : 0
         };
       }
     }
-
     return { success: true, cards, poolId };
   },
 
-  // 获取卡池可用抽卡次数
   getAvailablePulls(poolId) {
-    const state = GameState.get();
-    const ticketKey = `ticket_${poolId}`;
-    return (state[ticketKey] || 0) + (state.tickets || 0) + Math.floor(state.coins / 10);
+    const pool = POOLS[poolId];
+    if (!pool) return 0;
+    const c = GameState.get().coserData[pool.coserId];
+    return (c.tickets || 0) + Math.floor((c.beacon || 0) / 10);
   },
 
-  // 获取角色收集进度
   getCharacterProgress(charId) {
-    const allCards = getCardsByCharacter(charId);
-    const state = GameState.get();
-    const collected = allCards.filter(c => state.collection.includes(c.uid)).length;
-    return {
-      total: allCards.length,
-      collected,
-      percent: allCards.length > 0 ? Math.round((collected / allCards.length) * 100) : 0
-    };
+    const char = COSER_CHARS[charId];
+    if (!char) return { total: 0, collected: 0, percent: 0 };
+    const c = GameState.get().coserData[char.coserId];
+    const all = getCardsByCharacter(charId);
+    const collected = all.filter(card => c.collection.includes(card.uid)).length;
+    return { total: all.length, collected, percent: all.length > 0 ? Math.round(collected / all.length * 100) : 0 };
   },
 
-  // 获取角色已收集的卡牌列表
   getCollectedCardsForCharacter(charId) {
-    const allCards = getCardsByCharacter(charId);
-    const state = GameState.get();
-    return allCards.map(c => ({
-      ...c,
-      collected: state.collection.includes(c.uid)
+    const char = COSER_CHARS[charId];
+    if (!char) return [];
+    const c = GameState.get().coserData[char.coserId];
+    return getCardsByCharacter(charId).map(card => ({
+      ...card,
+      collected: c.collection.includes(card.uid)
     }));
+  },
+
+  // Coser 整体守护进度
+  getCoserProgress(coserId) {
+    const c = GameState.get().coserData[coserId];
+    const chars = getCharsByCoser(coserId);
+    const total = chars.length;
+    const collected = chars.filter(ch =>
+      ch.images.some((_, idx) => c.collection.includes(`${ch.id}_${idx}`))
+    ).length;
+    return { total, collected, percent: total > 0 ? Math.round(collected / total * 100) : 0 };
   }
 };
