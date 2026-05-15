@@ -824,7 +824,7 @@ const UI = {
         </div>
         <img class="pm-img" src="${dataUrl}" alt="poster">
         <div class="pm-hint">长按图片保存到相册 · 分享给朋友 = 邀请加入 Memoria Network</div>
-        <a class="pm-save-btn" download="memoria_${name}_${Date.now()}.jpg" href="${dataUrl}">↓ 下载海报</a>
+        <a class="pm-save-btn" download="memoria_${name}_${Date.now()}.webp" href="${dataUrl}">↓ 下载海报</a>
       </div>
     `;
     requestAnimationFrame(() => modal.classList.add('show'));
@@ -835,7 +835,7 @@ const UI = {
   downloadCardImage(src, name) {
     const a = document.createElement('a');
     a.href = src;
-    a.download = `${name}_${Date.now()}.jpg`;
+    a.download = `${name}_${Date.now()}.webp`;
     a.target = '_blank';
     document.body.appendChild(a);
     a.click();
